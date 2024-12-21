@@ -1,30 +1,32 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 // next
-import dynamic from 'next/dynamic';
+import dynamic from "next/dynamic";
 // mui
-import { Typography, Card, Stack, Box, IconButton } from '@mui/material';
+import { Typography, Card, Stack, Box, IconButton } from "@mui/material";
 // icons
-import { MdDeleteOutline } from 'react-icons/md';
-import { styled } from '@mui/material/styles';
+import { MdDeleteOutline } from "react-icons/md";
+import { styled } from "@mui/material/styles";
 // hooks
-import { useCurrencyConvert } from 'src/hooks/convertCurrency';
-import { useCurrencyFormatter } from 'src/hooks/formatCurrency';
+import { useCurrencyConvert } from "src/hooks/convertCurrency";
+import { useCurrencyFormatter } from "src/hooks/formatCurrency";
 // components
 
-import BlurImage from 'src/components/blurImage';
-const Incrementer = dynamic(() => import('src/components/incrementer'));
+import BlurImage from "src/components/blurImage";
+import { LiaShippingFastSolid } from "react-icons/lia";
+import { IoTimeOutline } from "react-icons/io5";
+const Incrementer = dynamic(() => import("src/components/incrementer"));
 
 const ThumbImgStyle = styled(Box)(({ theme }) => ({
   width: 40,
   height: 40,
   minWidth: 40,
-  objectFit: 'cover',
+  objectFit: "cover",
   marginRight: theme.spacing(2),
   borderRadius: 8,
   border: `1px solid ${theme.palette.divider}`,
-  position: 'relative',
-  overflow: 'hidden'
+  position: "relative",
+  overflow: "hidden"
 }));
 
 export default function CheckoutCard({ ...props }) {
@@ -34,27 +36,52 @@ export default function CheckoutCard({ ...props }) {
   return (
     <Box
       sx={{
-        '& .card-main': {
+        "& .card-main": {
           p: 2,
-          borderWidth: '1px 0 0 0',
-          '& .delete-icon': {
+          borderWidth: "1px 0 0 0",
+          "& .delete-icon": {
             fontSize: 20
           }
         },
-        display: { sm: 'none', xs: 'block' }
+        display: { sm: "none", xs: "block" }
       }}
     >
       {cart.map((product) => {
-        const { sku, name, brand, priceSale, color, size, image, quantity, available } = product;
+        const {
+          sku,
+          name,
+          brand,
+          price,
+          color,
+          size,
+          image,
+          quantity,
+          available,
+          subtotal,
+          type
+        } = product;
 
         return (
           <Card className="card-main" key={Math.random()}>
             <Stack direction="row" alignItems="center">
               <ThumbImgStyle>
-                <BlurImage priority fill alt="prod  uct image" src={image} />
+                <BlurImage
+                  priority
+                  fill
+                  alt="Product Image"
+                  src={
+                    image ||
+                    "https://www.shutterstock.com/image-photo/store-pharmacy-shelf-drug-medical-260nw-2268950357.jpg"
+                  }
+                />
               </ThumbImgStyle>
-              <Box sx={{ display: 'contents' }}>
-                <Typography variant="h5" color="text.primary" noWrap textOverflow="ellipsis">
+              <Box sx={{ display: "contents" }}>
+                <Typography
+                  variant="h5"
+                  color="text.primary"
+                  noWrap
+                  textOverflow="ellipsis"
+                >
                   {name}
                 </Typography>
                 <Typography variant="body2" color="text.primary" mb={0.5}>
@@ -67,16 +94,55 @@ export default function CheckoutCard({ ...props }) {
                 {/* <Typography variant="body2" color="text.primary" mb={0.5}>
                   {name}
                 </Typography> */}
+                {color && (
+                  <Typography variant="body2" color="text.primary" mb={0.5}>
+                    <b>Color:</b> {color}
+                    {/* { formatNumbers(Number(priceSale), Number(unitRate))} */}
+                  </Typography>
+                )}
+
+                {size && (
+                  <Typography variant="body2" color="text.primary" mb={0.5}>
+                    <b>Size:</b>
+                    {size}
+                  </Typography>
+                )}
+
+                <Typography
+                  variant="body2"
+                  style={{ display: "flex", justifyContent: "space-evenly" }}
+                  color="text.primary"
+                  mb={0.5}
+                >
+                  <b>Type:</b>
+                  <span
+                    style={{
+                      display: "flex",
+                      marginLeft: "4px",
+                      fontWeight: "500",
+                      justifyContent: "10px",
+                      alignSelf: "start",
+                      textAlign: "center"
+                    }}
+                    textAlign={"center"}
+                  >
+                    {type == "quick" ? (
+                      <LiaShippingFastSolid size={20} />
+                    ) : (
+                      <IoTimeOutline size={20} />
+                    )}
+
+                    {type}
+                  </span>
+                </Typography>
+
                 <Typography variant="body2" color="text.primary" mb={0.5}>
-                  <b>Color:</b> {color}
+                  <b>price:</b> {price > 0 ? "₹" + price : "-"}
                   {/* { formatNumbers(Number(priceSale), Number(unitRate))} */}
                 </Typography>
+
                 <Typography variant="body2" color="text.primary" mb={0.5}>
-                  <b>Size:</b>
-                  {size}
-                </Typography>
-                <Typography variant="body2" color="text.primary" mb={0.5}>
-                  <b>subtotal:</b> {fCurrency(cCurrency(priceSale * quantity))}
+                  <b>subtotal:</b> {subtotal > 1 ? "₹" + subtotal : "-"}
                   {/* { formatNumbers(Number(priceSale), Number(unitRate))} */}
                 </Typography>
                 {/* <Typography variant="body2" color="text.primary" mb={0.5}>
@@ -91,7 +157,11 @@ export default function CheckoutCard({ ...props }) {
                   onDecrease={() => onDecreaseQuantity(sku)}
                   onIncrease={() => onIncreaseQuantity(sku)}
                 />
-                <IconButton color="primary" onClick={() => onDelete(sku)} sx={{ mt: 1 }}>
+                <IconButton
+                  color="primary"
+                  onClick={() => onDelete(sku)}
+                  sx={{ mt: 1 }}
+                >
                   <MdDeleteOutline className="delete-icon" />
                 </IconButton>
               </Box>

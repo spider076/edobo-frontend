@@ -1,25 +1,31 @@
-'use client';
-import React from 'react';
-import dynamic from 'next/dynamic';
+"use client";
+import React from "react";
+import dynamic from "next/dynamic";
 // mui
-import { Box, Grid } from '@mui/material';
+import { Box, Grid } from "@mui/material";
 // api
-import * as api from 'src/services';
-import { useMutation } from 'react-query';
+import * as api from "src/services";
+import { useMutation } from "react-query";
 // redux
-import { useDispatch, useSelector } from 'react-redux';
-import { getCart } from 'src/redux/slices/product';
+import { useDispatch, useSelector } from "react-redux";
+import { getCart } from "src/redux/slices/product";
 // components
-import PaymentSummarySkeleton from 'src/components/skeletons/cart/paymentSummary';
-import ShoppingCartSkeleton from 'src/components/skeletons/cart/shoppingcart';
-import toast from 'react-hot-toast';
+import PaymentSummarySkeleton from "src/components/skeletons/cart/paymentSummary";
+import ShoppingCartSkeleton from "src/components/skeletons/cart/shoppingcart";
+import toast from "react-hot-toast";
 // dynamic
-const ShoppingCart = dynamic(() => import('src/components/_main/cart/shoppingCart'), {
-  loading: () => <ShoppingCartSkeleton />
-});
-const PaymentSummary = dynamic(() => import('src/components/_main/cart/paymentSummary'), {
-  loading: () => <PaymentSummarySkeleton />
-});
+const ShoppingCart = dynamic(
+  () => import("src/components/_main/cart/shoppingCart"),
+  {
+    loading: () => <ShoppingCartSkeleton />
+  }
+);
+const PaymentSummary = dynamic(
+  () => import("src/components/_main/cart/paymentSummary"),
+  {
+    loading: () => <PaymentSummarySkeleton />
+  }
+);
 
 export default function CartMain() {
   const dispatch = useDispatch();
@@ -34,7 +40,7 @@ export default function CartMain() {
     onError: (err) => {
       const message = JSON.stringify(err.response.data.message);
       setLoading(false);
-      toast.error(message ? JSON.parse(message) : 'Something went wrong!');
+      toast.error(message ? JSON.parse(message) : "Something went wrong!");
     }
   });
   React.useEffect(() => {

@@ -1,47 +1,53 @@
-'use client';
+"use client";
 // react
-import { sum } from 'lodash';
-import { useRouter } from 'next-nprogress-bar';
-import { usePathname } from 'next/navigation';
-import * as React from 'react';
-import { useSelector } from 'react-redux';
+import { sum } from "lodash";
+import { useRouter } from "next-nprogress-bar";
+import { usePathname } from "next/navigation";
+import * as React from "react";
+import { useSelector } from "react-redux";
 
 // mui
-import { Badge, Box, Button } from '@mui/material';
+import { Badge, Box, Button } from "@mui/material";
 
 // icons
-import { BsShopWindow } from 'react-icons/bs';
-import { FaRegUser, FaUser } from 'react-icons/fa6';
-import { HiHome, HiOutlineCamera, HiOutlineHome, HiOutlineShoppingBag, HiShoppingBag } from 'react-icons/hi';
-import { IoSearch } from 'react-icons/io5';
+import { BsShopWindow } from "react-icons/bs";
+import { FaRegUser, FaUser } from "react-icons/fa6";
+import {
+  HiHome,
+  HiOutlineCamera,
+  HiOutlineHome,
+  HiOutlineShoppingBag,
+  HiShoppingBag
+} from "react-icons/hi";
+import { IoSearch } from "react-icons/io5";
 
 // styles
-import RootStyled from './styled';
+import RootStyled from "./styled";
 
 // config
-import config from 'src/layout/_main/config.json';
+import config from "src/layout/_main/config.json";
 
 const getIcon = (href, totalItems) => {
   switch (href) {
-    case '/':
+    case "/":
       return <HiOutlineHome size={18} />;
-    case '/search':
+    case "/search":
       return <IoSearch size={18} />;
-    case '/cart':
+    case "/cart":
       return (
         <Badge
           showZero
           badgeContent={totalItems}
           color="error"
           max={99}
-          sx={{ zIndex: 0, span: { top: '4px', right: '-2px' } }}
+          sx={{ zIndex: 0, span: { top: "4px", right: "-2px" } }}
         >
           <HiOutlineShoppingBag size={18} />
         </Badge>
       );
-    case '/products':
+    case "/products":
       return <BsShopWindow size={18} />;
-    case '/camera':
+    case "/camera":
       return <HiOutlineCamera size={18} />;
     default:
       return <FaRegUser size={18} />;
@@ -50,25 +56,25 @@ const getIcon = (href, totalItems) => {
 
 const getActiveIcon = (href, totalItems) => {
   switch (href) {
-    case '/':
+    case "/":
       return <HiHome size={18} />;
-    case '/search':
+    case "/search":
       return <IoSearch size={18} />;
-    case '/cart':
+    case "/cart":
       return (
         <Badge
           showZero={false}
           badgeContent={totalItems}
           color="error"
           max={99}
-          sx={{ zIndex: 0, span: { top: '4px', right: '-2px' } }}
+          sx={{ zIndex: 0, span: { top: "4px", right: "-2px" } }}
         >
           <HiShoppingBag size={18} />
         </Badge>
       );
-    case '/products':
+    case "/products":
       return <BsShopWindow size={18} />;
-    case '/camera':
+    case "/camera":
       return <HiOutlineCamera size={18} />;
     default:
       return <FaUser size={18} />;
@@ -101,15 +107,15 @@ export default function MobileBar() {
         user
       });
       const index =
-        pathname.includes('/auth') || pathname.includes('/profile')
+        pathname.includes("/auth") || pathname.includes("/profile")
           ? 5
-          : pathname.includes('/cart')
+          : pathname.includes("/cart")
             ? 4
-            : pathname.includes('/products')
+            : pathname.includes("/products")
               ? 3
-              : pathname.includes('/camera')
+              : pathname.includes("/camera")
                 ? 2
-                : pathname.includes('/search')
+                : pathname.includes("/search")
                   ? 1
                   : 0;
       return index;
@@ -126,8 +132,8 @@ export default function MobileBar() {
       <Box className="appbar-wrapper">
         {mobile_menu.map((v, i) => (
           <Button
-            variant={index === i ? 'contained' : 'text'}
-            color={index === i ? 'primary' : 'inherit'}
+            variant={index === i ? "contained" : "text"}
+            color={index === i ? "primary" : "inherit"}
             startIcon={
               index === i
                 ? getActiveIcon(v.href, totalItems, state.notification)
@@ -137,10 +143,14 @@ export default function MobileBar() {
             size="large"
             className="nav-button"
             sx={{
-              borderRadius: i === 0 ? '0 6px 0 0' : i === 4 ? '6px 0 0 0' : '6px 6px 0 0',
+              borderRadius:
+                i === 0 ? "0 6px 0 0" : i === 4 ? "6px 0 0 0" : "6px 6px 0 0",
               fontWeight: index === i ? 600 : 400
             }}
-            onClick={onChangeMenu(user?.isAuthenticated && v.isUser ? '/profile' : v.href, i)}
+            onClick={onChangeMenu(
+              user?.isAuthenticated && v.isUser ? "/profile" : v.href,
+              i
+            )}
           >
             {v.name}
           </Button>

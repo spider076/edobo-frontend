@@ -1,6 +1,6 @@
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 // mui
-import { styled } from '@mui/material/styles';
+import { styled } from "@mui/material/styles";
 import {
   Box,
   Table,
@@ -12,32 +12,34 @@ import {
   IconButton,
   Skeleton,
   Stack
-} from '@mui/material';
-import { IoClose } from 'react-icons/io5';
+} from "@mui/material";
+import { IoClose, IoTimeOutline } from "react-icons/io5";
 
 //components
-import RootStyled from './styled';
-import Incrementer from 'src/components/incrementer';
+import RootStyled from "./styled";
+import Incrementer from "src/components/incrementer";
 // hooks
-import { useCurrencyConvert } from 'src/hooks/convertCurrency';
-import { useCurrencyFormatter } from 'src/hooks/formatCurrency';
-import BlurImage from 'src/components/blurImage';
+import { useCurrencyConvert } from "src/hooks/convertCurrency";
+import { useCurrencyFormatter } from "src/hooks/formatCurrency";
+import BlurImage from "src/components/blurImage";
+import { LiaShippingFastSolid } from "react-icons/lia";
 
 const ThumbImgStyle = styled(Box)(({ theme }) => ({
   width: 56,
   height: 56,
   marginRight: theme.spacing(2),
-  borderRadius: '8px',
+  borderRadius: "8px",
   border: `1px solid ${theme.palette.divider}`,
-  position: 'relative',
-  overflow: 'hidden'
+  position: "relative",
+  overflow: "hidden"
 }));
 
 // ----------------------------------------------------------------------
 
 export default function CartProductList({ ...props }) {
-  const { onDelete, onIncreaseQuantity, onDecreaseQuantity, isLoading, cart } = props;
-  console.log(props, 'propesss');
+  const { onDelete, onIncreaseQuantity, onDecreaseQuantity, isLoading, cart } =
+    props;
+  console.log(props, "propesss");
 
   const cCurrency = useCurrencyConvert();
   const fCurrency = useCurrencyFormatter();
@@ -46,36 +48,85 @@ export default function CartProductList({ ...props }) {
       <Table>
         <TableHead>
           <TableRow className="table-head-row">
-            <TableCell>{isLoading ? <Skeleton variant="text" width={100} /> : 'Product'}</TableCell>
-            <TableCell align="center">
-              {isLoading ? <Skeleton variant="text" width={80} sx={{ mx: 'auto' }} /> : 'Price'}
+            <TableCell>
+              {isLoading ? <Skeleton variant="text" width={100} /> : "Product"}
             </TableCell>
             <TableCell align="center">
-              {isLoading ? <Skeleton variant="text" width={80} sx={{ mx: 'auto' }} /> : 'Quantity'}
+              {isLoading ? (
+                <Skeleton variant="text" width={80} sx={{ mx: "auto" }} />
+              ) : (
+                "Price"
+              )}
+            </TableCell>
+            <TableCell align="center">
+              {isLoading ? (
+                <Skeleton variant="text" width={80} sx={{ mx: "auto" }} />
+              ) : (
+                "Quantity"
+              )}
             </TableCell>
 
             <TableCell align="center">
-              {isLoading ? <Skeleton variant="text" width={63} sx={{ mx: 'auto' }} /> : 'Total Price'}
+              {isLoading ? (
+                <Skeleton variant="text" width={63} sx={{ mx: "auto" }} />
+              ) : (
+                "Total Price"
+              )}
             </TableCell>
             <TableCell align="right">
-              {isLoading ? <Skeleton variant="text" width={44} sx={{ ml: 'auto' }} /> : 'Action'}
+              {isLoading ? (
+                <Skeleton variant="text" width={44} sx={{ ml: "auto" }} />
+              ) : (
+                "Type"
+              )}
+            </TableCell>
+            <TableCell align="right">
+              {isLoading ? (
+                <Skeleton variant="text" width={44} sx={{ ml: "auto" }} />
+              ) : (
+                "Action"
+              )}
             </TableCell>
           </TableRow>
         </TableHead>
 
         <TableBody>
           {cart.map((product) => {
-            const { sku, name, size, color, quantity, available, price, priceSale, image } = product;
+            const {
+              sku,
+              name,
+              type,
+              size,
+              color,
+              quantity,
+              available,
+              price,
+              priceSale,
+              image
+            } = product;
 
             return (
               <TableRow key={Math.random()}>
                 <TableCell>
                   <Box className="product-sec">
                     {isLoading ? (
-                      <Skeleton variant="rounded" width={56} height={56} sx={{ mr: 2 }} />
+                      <Skeleton
+                        variant="rounded"
+                        width={56}
+                        height={56}
+                        sx={{ mr: 2 }}
+                      />
                     ) : (
                       <ThumbImgStyle>
-                        <BlurImage priority fill alt="product image" src={image} />
+                        <BlurImage
+                          priority
+                          fill
+                          alt="product image"
+                          src={
+                            image ||
+                            "https://www.shutterstock.com/image-photo/store-pharmacy-shelf-drug-medical-260nw-2268950357.jpg"
+                          }
+                        />
                       </ThumbImgStyle>
                     )}
                     <Box>
@@ -84,10 +135,14 @@ export default function CartProductList({ ...props }) {
                         variant="subtitle1"
                         className="subtitle"
                         lineHeight={1}
-                        mb={0 + '!important'}
+                        mb={0 + "!important"}
                         paddingY={0.7}
                       >
-                        {isLoading ? <Skeleton variant="text" width={150} /> : name}
+                        {isLoading ? (
+                          <Skeleton variant="text" width={150} />
+                        ) : (
+                          name
+                        )}
                       </Typography>
 
                       <Stack>
@@ -95,16 +150,26 @@ export default function CartProductList({ ...props }) {
                           {isLoading ? (
                             <Skeleton variant="text" width={60} />
                           ) : (
-                            <Typography variant="body2" sx={{ span: { textTransform: 'uppercase' } }}>
-                              <b>Size:</b> <span>{size}</span>
-                            </Typography>
+                            size && (
+                              <Typography
+                                variant="body2"
+                                sx={{ span: { textTransform: "uppercase" } }}
+                              >
+                                <b>Size:</b> <span>{size}</span>
+                              </Typography>
+                            )
                           )}
                           {isLoading ? (
                             <Skeleton variant="text" width={60} />
                           ) : (
-                            <Typography variant="body2" sx={{ span: { textTransform: 'uppercase' } }}>
-                              <b>Color:</b> <span>{color}</span>
-                            </Typography>
+                            color && (
+                              <Typography
+                                variant="body2"
+                                sx={{ span: { textTransform: "uppercase" } }}
+                              >
+                                <b>Color:</b> <span>{color}</span>
+                              </Typography>
+                            )
                           )}
                         </Stack>
                       </Stack>
@@ -113,25 +178,34 @@ export default function CartProductList({ ...props }) {
                 </TableCell>
                 <TableCell>
                   {isLoading ? (
-                    <Skeleton variant="text" width={52} sx={{ mx: 'auto' }} />
+                    <Skeleton variant="text" width={52} sx={{ mx: "auto" }} />
                   ) : (
-                    <Typography variant="body1" color="text.primary" fontWeight={600}>
-                      ${price}
+                    <Typography
+                      variant="body1"
+                      color="text.primary"
+                      fontWeight={600}
+                    >
+                      {type == "quick" ? "₹" + price : "-"}
                     </Typography>
                   )}
                 </TableCell>
                 <TableCell
                   align="center"
                   sx={{
-                    '& > div': {
-                      mx: 'auto'
+                    "& > div": {
+                      mx: "auto"
                     }
                   }}
                 >
                   {isLoading ? (
-                    <Stack width={96} sx={{ mx: 'auto' }}>
+                    <Stack width={96} sx={{ mx: "auto" }}>
                       <Skeleton variant="rounded" width={96} height={36} />
-                      <Skeleton variant="rounded" width={40} height={12} sx={{ ml: 'auto', mt: 0.5 }} />
+                      <Skeleton
+                        variant="rounded"
+                        width={40}
+                        height={12}
+                        sx={{ ml: "auto", mt: 0.5 }}
+                      />
                     </Stack>
                   ) : (
                     <Incrementer
@@ -144,16 +218,54 @@ export default function CartProductList({ ...props }) {
                 </TableCell>
                 <TableCell align="center">
                   {isLoading ? (
-                    <Skeleton variant="text" width={52} sx={{ mx: 'auto' }} />
+                    <Skeleton variant="text" width={52} sx={{ mx: "auto" }} />
                   ) : (
-                    <Typography variant="subtitle2">{fCurrency(cCurrency(quantity * (priceSale || price)))}</Typography>
+                    <Typography variant="subtitle2">
+                      {type == "quick"
+                        ? fCurrency(cCurrency(quantity * (priceSale || price)))
+                        : "-"}
+                    </Typography>
+                  )}
+                </TableCell>
+                <TableCell align="center">
+                  {isLoading ? (
+                    <Skeleton variant="text" width={52} sx={{ mx: "auto" }} />
+                  ) : (
+                    <Typography
+                      variant="subtitle2"
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-evenly",
+                        alignSelf: "start",
+                        textAlign: "center"
+                      }}
+                      textAlign={"center"}
+                    >
+                      {type == "quick" ? (
+                        <LiaShippingFastSolid size={20} />
+                      ) : (
+                        <IoTimeOutline size={20} />
+                      )}
+
+                      {type}
+                    </Typography>
                   )}
                 </TableCell>
                 <TableCell align="right">
                   {isLoading ? (
-                    <Skeleton variant="circular" width={40} height={40} sx={{ ml: 'auto' }} />
+                    <Skeleton
+                      variant="circular"
+                      width={40}
+                      height={40}
+                      sx={{ ml: "auto" }}
+                    />
                   ) : (
-                    <IconButton aria-label="delete" color="inherit" onClick={() => onDelete(sku)} size="small">
+                    <IconButton
+                      aria-label="delete"
+                      color="inherit"
+                      onClick={() => onDelete(sku)}
+                      size="small"
+                    >
                       <IoClose size={24} />
                     </IconButton>
                   )}

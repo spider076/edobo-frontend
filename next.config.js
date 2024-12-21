@@ -8,8 +8,9 @@ const nextConfig = {
     return config;
   },
   env: {
-    BASE_URL: `https://api.ravijadhwani.me`,
+    BASE_URL: process.env.BASE_URL,
     CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME,
+    GOOGLEMAPS_APIKEY: process.env.GOOGLEMAPS_APIKEY,
     STRIPE_PUBLIC_KEY: process.env.STRIPE_PUBLIC_KEY,
     STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
     BASE_CURRENCY: process.env.BASE_CURRENCY,
@@ -18,7 +19,7 @@ const nextConfig = {
     PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID
   },
   images: {
-    domains: ['nextall.vercel.app', 'res.cloudinary.com']
+    domains: ["nextall.vercel.app", "res.cloudinary.com", "www.shutterstock.com"]
   }
 };
 

@@ -1,33 +1,46 @@
-'use client';
+"use client";
 
-import CloseIcon from '@mui/icons-material/Close';
-import { Box, Button, Grid, IconButton, TextField, Typography } from '@mui/material';
-import { Autocomplete, GoogleMap, Marker, useJsApiLoader } from '@react-google-maps/api';
-import { useEffect, useState } from 'react';
-import { useDispatch } from 'react-redux';
-import { setLocation } from 'src/redux/slices/user';
+import CloseIcon from "@mui/icons-material/Close";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  TextField,
+  Typography
+} from "@mui/material";
+import {
+  Autocomplete,
+  GoogleMap,
+  Marker,
+  useJsApiLoader
+} from "@react-google-maps/api";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setLocation } from "src/redux/slices/user";
 
 const LocationPopup = ({ onClose }) => {
   const [isVisible, setIsVisible] = useState(true);
   const [locationAccess, setLocationAccess] = useState(null);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState("");
   const [autocomplete, setAutocomplete] = useState(null);
   const [address, setAddress] = useState({
-    street: '',
-    city: '',
-    state: '',
-    postalCode: '',
-    country: ''
+    street: "",
+    city: "",
+    state: "",
+    postalCode: "",
+    country: ""
   });
 
   const dispatch = useDispatch();
-  const location = window?.localStorage.getItem('location')
-    ? JSON.parse(window.localStorage.getItem('location'))
+  const location = window?.localStorage.getItem("location")
+    ? JSON.parse(window.localStorage.getItem("location"))
     : null;
 
+  console.log("sadfdsf : ", process.env.GOOGLEMAPS_APIKEY);
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: 'AIzaSyBYaUmkSyrXGhQhl2GmRjpQ53a99fI7d5E',
-    libraries: ['places']
+    googleMapsApiKey: process.env.GOOGLEMAPS_APIKEY,
+    libraries: ["places"]
   });
 
   let geocoder;
@@ -36,7 +49,7 @@ const LocationPopup = ({ onClose }) => {
   }
 
   const handleAllowLocation = () => {
-    if ('geolocation' in navigator) {
+    if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
           const coords = {
@@ -47,7 +60,7 @@ const LocationPopup = ({ onClose }) => {
           fetchAddressFromCoords(coords);
         },
         (error) => {
-          console.log('Location permission denied:', error);
+          console.log("Location permission denied:", error);
           setIsVisible(false);
           onClose();
         }
@@ -58,10 +71,10 @@ const LocationPopup = ({ onClose }) => {
   const fetchAddressFromCoords = (coords) => {
     if (!geocoder) return;
     geocoder.geocode({ location: coords }, (results, status) => {
-      if (status === 'OK' && results[0]) {
+      if (status === "OK" && results[0]) {
         setSearchInput(results[0].formatted_address);
       } else {
-        console.error('Geocoder failed: ', status);
+        console.error("Geocoder failed: ", status);
       }
     });
   };
@@ -75,7 +88,7 @@ const LocationPopup = ({ onClose }) => {
           lng: place.geometry.location.lng()
         };
         setLocationAccess(coords);
-        setSearchInput(place.formatted_address || '');
+        setSearchInput(place.formatted_address || "");
       }
     }
   };
@@ -89,8 +102,8 @@ const LocationPopup = ({ onClose }) => {
 
   const handleSubmit = () => {
     dispatch(setLocation(searchInput));
-    window.localStorage.setItem('location', JSON.stringify(searchInput));
-    console.log('Address Submitted:', address);
+    window.localStorage.setItem("location", JSON.stringify(searchInput));
+    console.log("Address Submitted:", address);
     onClose();
   };
 
@@ -98,7 +111,7 @@ const LocationPopup = ({ onClose }) => {
     if (!isVisible) onClose();
   }, [isVisible, onClose, locationAccess]);
 
-  console.log('ocation : ', location);
+  console.log("ocation : ", location);
 
   if (location) return null;
 
@@ -107,24 +120,24 @@ const LocationPopup = ({ onClose }) => {
   return (
     <Box
       sx={{
-        position: 'fixed',
-        top: '10%',
-        left: '50%',
-        transform: 'translateX(-50%)',
-        width: '90%',
-        maxWidth: '600px',
+        position: "fixed",
+        top: "10%",
+        left: "50%",
+        transform: "translateX(-50%)",
+        width: "90%",
+        maxWidth: "600px",
         p: 2,
-        bgcolor: 'white',
+        bgcolor: "white",
         boxShadow: 3,
         borderRadius: 2,
         zIndex: 1000,
-        textAlign: 'center'
+        textAlign: "center"
       }}
     >
       <IconButton
         onClick={() => setIsVisible(false)}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 8,
           right: 8
         }}
@@ -134,7 +147,7 @@ const LocationPopup = ({ onClose }) => {
       <IconButton
         onClick={() => setIsVisible(false)}
         sx={{
-          position: 'absolute',
+          position: "absolute",
           top: 8,
           right: 8
         }}
@@ -148,7 +161,11 @@ const LocationPopup = ({ onClose }) => {
         We need your location to provide the best shopping experience.
       </Typography>
       {!locationAccess ? (
-        <Button variant="contained" color="primary" onClick={handleAllowLocation}>
+        <Button
+          variant="contained"
+          color="primary"
+          onClick={handleAllowLocation}
+        >
           Allow Location
         </Button>
       ) : (
@@ -156,7 +173,10 @@ const LocationPopup = ({ onClose }) => {
           {/* Non Mobile Screens */}
           <Grid item xs={12} md={6} lg={6}>
             <Box sx={{ mb: 2 }}>
-              <Autocomplete onLoad={(auto) => setAutocomplete(auto)} onPlaceChanged={handlePlaceChanged}>
+              <Autocomplete
+                onLoad={(auto) => setAutocomplete(auto)}
+                onPlaceChanged={handlePlaceChanged}
+              >
                 <TextField
                   label="Search Location"
                   variant="outlined"
@@ -167,7 +187,11 @@ const LocationPopup = ({ onClose }) => {
                 />
               </Autocomplete>
             </Box>
-            <GoogleMap mapContainerStyle={{ width: '100%', height: '200px' }} center={locationAccess} zoom={12}>
+            <GoogleMap
+              mapContainerStyle={{ width: "100%", height: "200px" }}
+              center={locationAccess}
+              zoom={12}
+            >
               <Marker position={locationAccess} />
             </GoogleMap>
           </Grid>
@@ -178,12 +202,12 @@ const LocationPopup = ({ onClose }) => {
             md={6}
             lg={6}
             sx={{
-              '@media (max-width:600px)': {
-                flexDirection: 'row',
-                flexWrap: 'no-wrap',
-                '& .MuiTextField-root': {
-                  width: 'calc(50% - 16px)',
-                  margin: '8px'
+              "@media (max-width:600px)": {
+                flexDirection: "row",
+                flexWrap: "no-wrap",
+                "& .MuiTextField-root": {
+                  width: "calc(50% - 16px)",
+                  margin: "8px"
                 }
               }
             }}
@@ -237,7 +261,13 @@ const LocationPopup = ({ onClose }) => {
               margin="normal"
             />
 
-            <Button variant="contained" color="primary" fullWidth sx={{ mt: 2 }} onClick={handleSubmit}>
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={handleSubmit}
+            >
               Submit
             </Button>
           </Grid>
