@@ -1,59 +1,77 @@
-'use client';
-import { useState } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { useRouter } from 'next-nprogress-bar';
-import RouterLink from 'next/link';
-import { toast } from 'react-hot-toast';
+"use client";
+import { useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useRouter } from "next-nprogress-bar";
+import RouterLink from "next/link";
+import { toast } from "react-hot-toast";
 // yup
-import * as Yup from 'yup';
+import * as Yup from "yup";
 // formik
-import { useFormik, Form, FormikProvider } from 'formik';
+import { useFormik, Form, FormikProvider } from "formik";
 // redux
-import { useDispatch } from 'react-redux';
-import { setLogin } from 'src/redux/slices/user';
+import { useDispatch } from "react-redux";
+import { setLogin } from "src/redux/slices/user";
 // api
-import { useMutation } from 'react-query';
-import * as api from 'src/services';
+import { useMutation } from "react-query";
+import * as api from "src/services";
 // mui
-import { Stack, TextField, IconButton, InputAdornment, MenuItem, Typography, Link } from '@mui/material';
-import { LoadingButton } from '@mui/lab';
+import {
+  Stack,
+  TextField,
+  IconButton,
+  InputAdornment,
+  MenuItem,
+  Typography,
+  Link
+} from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 // icons
-import { MdOutlineVisibility } from 'react-icons/md';
-import { MdOutlineVisibilityOff } from 'react-icons/md';
-import { IoMdMale } from 'react-icons/io';
-import { IoMdMail } from 'react-icons/io';
-import { MdLock } from 'react-icons/md';
-import { IoMdFemale } from 'react-icons/io';
-import { IoPerson } from 'react-icons/io5';
-import { MdLocalPhone } from 'react-icons/md';
-import { FaTransgender } from 'react-icons/fa6';
+import { MdOutlineVisibility } from "react-icons/md";
+import { MdOutlineVisibilityOff } from "react-icons/md";
+import { IoMdMale } from "react-icons/io";
+import { IoMdMail } from "react-icons/io";
+import { MdLock } from "react-icons/md";
+import { IoMdFemale } from "react-icons/io";
+import { IoPerson } from "react-icons/io5";
+import { MdLocalPhone } from "react-icons/md";
+import { FaTransgender } from "react-icons/fa6";
 // hooks
-import { createCookies } from 'src/hooks/cookies';
+import { createCookies } from "src/hooks/cookies";
 
 export default function RegisterForm() {
   const router = useRouter();
   const searchParam = useSearchParams();
-  const redirect = searchParam.get('redirect');
+  const redirect = searchParam.get("redirect");
   const dispatch = useDispatch();
   const [loading, setloading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const phoneRegExp =
     /^((\\+[1-9]{1,4}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
   const RegisterSchema = Yup.object().shape({
-    firstName: Yup.string().max(50, 'Too long!').required('First name is required'),
-    lastName: Yup.string().max(50, 'Too long!').required('Last name is required'),
-    email: Yup.string().email('Enter valid email').required('Email is required'),
-    phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
-    password: Yup.string().required('Password is required').min(8, 'Password should be 8 characters or longer.')
+    firstName: Yup.string()
+      .max(50, "Too long!")
+      .required("First name is required"),
+    lastName: Yup.string()
+      .max(50, "Too long!")
+      .required("Last name is required"),
+    email: Yup.string()
+      .email("Enter valid email")
+      .required("Email is required"),
+    phone: Yup.string()
+      .matches(phoneRegExp, "Phone number is not valid")
+      .required("Phone number is required"),
+    password: Yup.string()
+      .required("Password is required")
+      .min(8, "Password should be 8 characters or longer.")
   });
   const formik = useFormik({
     initialValues: {
-      firstName: '',
-      lastName: '',
-      phone: '',
-      gender: 'male',
-      email: '',
-      password: ''
+      firstName: "",
+      lastName: "",
+      phone: "",
+      gender: "male",
+      email: "",
+      password: ""
     },
     validationSchema: RegisterSchema,
     onSubmit: async (values) => {
@@ -66,15 +84,17 @@ export default function RegisterForm() {
   const { mutate } = useMutation(api.register, {
     onSuccess: async (data) => {
       dispatch(setLogin(data.user));
-      await createCookies('token', data.token);
+      await createCookies("token", data.token);
       toast.success(data.message);
-      toast.success('OTP sent to your email' + ' ' + data.user.firstName);
+      toast.success("OTP sent to your email" + " " + data.user.firstName);
       setloading(false);
-      router.push(redirect ? `/auth/verify-otp?redirect=${redirect}` : `/auth/verify-otp`);
+      router.push(
+        redirect ? `/auth/verify-otp?redirect=${redirect}` : `/auth/verify-otp`
+      );
     },
     onError: (err) => {
       const message = JSON.stringify(err.response.data.message);
-      toast.error(message ? JSON.parse(message) : 'Something went wrong!');
+      toast.error(message ? JSON.parse(message) : "Something went wrong!");
       setloading(false);
     }
   });
@@ -85,16 +105,21 @@ export default function RegisterForm() {
     <FormikProvider value={formik}>
       <Form autoComplete="off" noValidate onSubmit={handleSubmit}>
         <Stack spacing={3}>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <Stack gap={0.5} width={1}>
-              <Typography variant="overline" color="text.primary" htmlFor="firstName" component={'label'}>
+              <Typography
+                variant="overline"
+                color="text.primary"
+                htmlFor="firstName"
+                component={"label"}
+              >
                 First Name
               </Typography>
               <TextField
                 id="firstName"
                 fullWidth
                 type="text"
-                {...getFieldProps('firstName')}
+                {...getFieldProps("firstName")}
                 error={Boolean(touched.firstName && errors.firstName)}
                 helperText={touched.firstName && errors.firstName}
                 InputProps={{
@@ -107,14 +132,19 @@ export default function RegisterForm() {
               />
             </Stack>
             <Stack gap={0.5} width={1}>
-              <Typography variant="overline" color="text.primary" htmlFor="lastName" component={'label'}>
+              <Typography
+                variant="overline"
+                color="text.primary"
+                htmlFor="lastName"
+                component={"label"}
+              >
                 Last Name
               </Typography>
               <TextField
                 fullWidth
                 id="lastName"
                 type="text"
-                {...getFieldProps('lastName')}
+                {...getFieldProps("lastName")}
                 error={Boolean(touched.lastName && errors.lastName)}
                 helperText={touched.lastName && errors.lastName}
                 InputProps={{
@@ -127,24 +157,29 @@ export default function RegisterForm() {
               />
             </Stack>
           </Stack>
-          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+          <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
             <Stack gap={0.5} width={1}>
-              <Typography variant="overline" color="text.primary" htmlFor="gender" component={'label'}>
+              <Typography
+                variant="overline"
+                color="text.primary"
+                htmlFor="gender"
+                component={"label"}
+              >
                 Gender
               </Typography>
               <TextField
                 id="gender"
                 select
                 fullWidth
-                {...getFieldProps('gender')}
+                {...getFieldProps("gender")}
                 error={Boolean(touched.gender && errors.gender)}
                 helperText={touched.gender && errors.gender}
                 InputProps={{
                   startAdornment: (
                     <InputAdornment position="start">
-                      {values.gender === 'male' ? (
+                      {values.gender === "male" ? (
                         <IoMdMale size={24} />
-                      ) : values.gender === 'female' ? (
+                      ) : values.gender === "female" ? (
                         <IoMdFemale size={24} />
                       ) : (
                         <FaTransgender />
@@ -153,7 +188,7 @@ export default function RegisterForm() {
                   )
                 }}
               >
-                {['Male', 'Female', 'Other'].map((option) => (
+                {["Male", "Female", "Other"].map((option) => (
                   <MenuItem key={option} value={option.toLowerCase()}>
                     {option}
                   </MenuItem>
@@ -161,14 +196,19 @@ export default function RegisterForm() {
               </TextField>
             </Stack>
             <Stack gap={0.5} width={1}>
-              <Typography variant="overline" color="text.primary" htmlFor="phone" component={'label'}>
+              <Typography
+                variant="overline"
+                color="text.primary"
+                htmlFor="phone"
+                component={"label"}
+              >
                 Phone
               </Typography>
               <TextField
                 fullWidth
                 id="phone"
                 type="text"
-                {...getFieldProps('phone')}
+                {...getFieldProps("phone")}
                 error={Boolean(touched.phone && errors.phone)}
                 helperText={touched.phone && errors.phone}
                 InputProps={{
@@ -182,7 +222,12 @@ export default function RegisterForm() {
             </Stack>
           </Stack>
           <Stack gap={0.5} width={1}>
-            <Typography variant="overline" color="text.primary" htmlFor="email" component={'label'}>
+            <Typography
+              variant="overline"
+              color="text.primary"
+              htmlFor="email"
+              component={"label"}
+            >
               Email
             </Typography>
             <TextField
@@ -190,7 +235,7 @@ export default function RegisterForm() {
               fullWidth
               autoComplete="username"
               type="email"
-              {...getFieldProps('email')}
+              {...getFieldProps("email")}
               error={Boolean(touched.email && errors.email)}
               helperText={touched.email && errors.email}
               InputProps={{
@@ -203,15 +248,20 @@ export default function RegisterForm() {
             />
           </Stack>
           <Stack gap={0.5} width={1}>
-            <Typography variant="overline" color="text.primary" htmlFor="password" component={'label'}>
+            <Typography
+              variant="overline"
+              color="text.primary"
+              htmlFor="password"
+              component={"label"}
+            >
               Password
             </Typography>
             <TextField
               id="password"
               fullWidth
               autoComplete="current-password"
-              type={showPassword ? 'text' : 'password'}
-              {...getFieldProps('password')}
+              type={showPassword ? "text" : "password"}
+              {...getFieldProps("password")}
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
@@ -220,8 +270,15 @@ export default function RegisterForm() {
                 ),
                 endAdornment: (
                   <InputAdornment position="end">
-                    <IconButton edge="end" onClick={() => setShowPassword((prev) => !prev)}>
-                      {showPassword ? <MdOutlineVisibility size={24} /> : <MdOutlineVisibilityOff size={24} />}
+                    <IconButton
+                      edge="end"
+                      onClick={() => setShowPassword((prev) => !prev)}
+                    >
+                      {showPassword ? (
+                        <MdOutlineVisibility size={24} />
+                      ) : (
+                        <MdOutlineVisibilityOff size={24} />
+                      )}
                     </IconButton>
                   </InputAdornment>
                 )
@@ -231,7 +288,13 @@ export default function RegisterForm() {
             />
           </Stack>
 
-          <LoadingButton fullWidth size="large" type="submit" variant="contained" loading={loading}>
+          <LoadingButton
+            fullWidth
+            size="large"
+            type="submit"
+            variant="contained"
+            loading={loading}
+          >
             Register
           </LoadingButton>
         </Stack>
@@ -239,19 +302,34 @@ export default function RegisterForm() {
         <Typography variant="subtitle2" mt={3} textAlign="center">
           Already have an account? &nbsp;
           <Link
-            href={`/auth/login${router.query?.redirect ? '?redirect=' + router.query?.redirect : ''}`}
+            href={`/auth/login${router.query?.redirect ? "?redirect=" + router.query?.redirect : ""}`}
             component={RouterLink}
           >
             Login
           </Link>
         </Typography>
-        <Typography variant="body2" align="center" color="text.secondary" mt={2}>
+        <Typography
+          variant="body2"
+          align="center"
+          color="text.secondary"
+          mt={2}
+        >
           By registering, I agree to Nextall&nbsp;
-          <Link underline="always" color="text.primary" href="#" fontWeight={700}>
+          <Link
+            underline="always"
+            color="text.primary"
+            href="#"
+            fontWeight={700}
+          >
             Terms
           </Link>
           &nbsp;and&nbsp;
-          <Link underline="always" color="text.primary" href="#" fontWeight={700}>
+          <Link
+            underline="always"
+            color="text.primary"
+            href="#"
+            fontWeight={700}
+          >
             Privacy policy
           </Link>
           .

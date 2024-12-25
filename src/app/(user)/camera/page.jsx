@@ -50,6 +50,12 @@ const CameraPage = () => {
       const message = JSON.stringify(err.response.data.message);
       setLoading(false);
       toast.error(message ? JSON.parse(message) : "Something went wrong!");
+
+      console.log('rs pons : ', err.response.status);
+
+      if (err.response.status === 401) {
+        router.push("/auth/login");
+      }
     }
   });
   const checkCameraPermission = useCallback(async () => {
