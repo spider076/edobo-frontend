@@ -1,5 +1,5 @@
-import { sum, map, filter, uniqBy } from 'lodash';
-import { createSlice } from '@reduxjs/toolkit';
+import { sum, map, filter, uniqBy } from "lodash";
+import { createSlice } from "@reduxjs/toolkit";
 
 // ----------------------------------------------------------------------
 
@@ -17,14 +17,18 @@ const initialState = {
 };
 
 const slice = createSlice({
-  name: 'product',
+  name: "product",
   initialState,
   reducers: {
     // CHECKOUT
     getCart(state, action) {
       const cart = action.payload;
 
-      const subtotal = sum(cart.map((product) => (product.priceSale || product.price) * product.quantity));
+      const subtotal = sum(
+        cart.map(
+          (product) => (product.priceSale || product.price) * product.quantity
+        )
+      );
       const discount = cart.length === 0 ? 0 : state.checkout.discount;
       const shipping = cart.length === 0 ? 0 : shippingFee;
       const billing = cart.length === 0 ? null : state.checkout.billing;
@@ -58,16 +62,25 @@ const slice = createSlice({
           return _product;
         });
       }
-      state.checkout.cart = uniqBy([...state.checkout.cart, updatedProduct], 'sku');
+      state.checkout.cart = uniqBy(
+        [...state.checkout.cart, updatedProduct],
+        "sku"
+      );
     },
 
     clearCart(state, action) {
-      const updateCart = filter(state.checkout.cart, (item) => item.sku !== action.payload);
+      const updateCart = filter(
+        state.checkout.cart,
+        (item) => item._id !== action.payload
+      );
 
       state.checkout.cart = updateCart;
     },
     deleteCart(state, action) {
-      const updateCart = filter(state.checkout.cart, (item) => item.sku !== action.payload);
+      const updateCart = filter(
+        state.checkout.cart,
+        (item) => item._id !== action.payload
+      );
 
       state.checkout.cart = updateCart;
     },
@@ -84,7 +97,8 @@ const slice = createSlice({
     increaseQuantity(state, action) {
       const productSku = action.payload;
       const updateCart = map(state.checkout.cart, (product) => {
-        if (product.sku === productSku) {
+        if (product._id === productSku) {
+          // NOTE : replaced sku by _id
           return {
             ...product,
             quantity: product.quantity + 1
@@ -99,7 +113,7 @@ const slice = createSlice({
     decreaseQuantity(state, action) {
       const productSku = action.payload;
       const updateCart = map(state.checkout.cart, (product) => {
-        if (product.sku === productSku) {
+        if (product._id === productSku) {
           return {
             ...product,
             quantity: product.quantity - 1

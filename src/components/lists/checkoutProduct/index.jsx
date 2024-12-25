@@ -77,7 +77,7 @@ export default function CartProductList({ ...props }) {
               {isLoading ? (
                 <Skeleton variant="text" width={44} sx={{ ml: "auto" }} />
               ) : (
-                "Type"
+                "Delivery"
               )}
             </TableCell>
             <TableCell align="right">
@@ -93,6 +93,7 @@ export default function CartProductList({ ...props }) {
         <TableBody>
           {cart.map((product) => {
             const {
+              _id,
               sku,
               name,
               type,
@@ -102,6 +103,7 @@ export default function CartProductList({ ...props }) {
               available,
               price,
               priceSale,
+              subtotal,
               image
             } = product;
 
@@ -211,8 +213,8 @@ export default function CartProductList({ ...props }) {
                     <Incrementer
                       quantity={quantity}
                       available={available}
-                      onDecrease={() => onDecreaseQuantity(sku)}
-                      onIncrease={() => onIncreaseQuantity(sku)}
+                      onDecrease={() => onDecreaseQuantity(_id)}
+                      onIncrease={() => onIncreaseQuantity(_id)}
                     />
                   )}
                 </TableCell>
@@ -263,7 +265,7 @@ export default function CartProductList({ ...props }) {
                     <IconButton
                       aria-label="delete"
                       color="inherit"
-                      onClick={() => onDelete(sku)}
+                      onClick={() => onDelete(_id)}
                       size="small"
                     >
                       <IoClose size={24} />
