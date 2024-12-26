@@ -4,6 +4,7 @@ export const register = async (payload) => {
   const { data } = await http.post(`/auth/register`, payload);
   return data;
 };
+
 export const verifyOTP = async (payload) => {
   const { data } = await http.post(`/auth/verify-otp`, payload);
   return data;
