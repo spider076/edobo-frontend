@@ -1,9 +1,14 @@
-'use client';
-import { useState, useEffect } from 'react';
-import { useRouter } from 'next-nprogress-bar';
-import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, WhatsappShareButton } from 'next-share';
-import PropTypes from 'prop-types';
-import { toast } from 'react-hot-toast';
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next-nprogress-bar";
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  WhatsappShareButton
+} from "next-share";
+import PropTypes from "prop-types";
+import { toast } from "react-hot-toast";
 // mui
 import {
   Box,
@@ -15,25 +20,25 @@ import {
   Skeleton,
   Rating,
   useMediaQuery
-} from '@mui/material';
+} from "@mui/material";
 // icons
-import { IoIosAdd, IoIosRemove } from 'react-icons/io';
-import { IoLogoWhatsapp } from 'react-icons/io5';
-import { FaFacebook } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
-import { FaLinkedin } from 'react-icons/fa';
-import { MdContentCopy } from 'react-icons/md';
+import { IoIosAdd, IoIosRemove } from "react-icons/io";
+import { IoLogoWhatsapp } from "react-icons/io5";
+import { FaFacebook } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
 // formik
-import { useFormik, Form, FormikProvider, useField } from 'formik';
+import { useFormik, Form, FormikProvider, useField } from "formik";
 // redux
-import { useDispatch, useSelector } from 'src/redux/store';
-import { addCart } from 'src/redux/slices/product';
+import { useDispatch, useSelector } from "src/redux/store";
+import { addCart } from "src/redux/slices/product";
 
 // components
-import ColorPreview from 'src/components/colorPreview';
-import SizePreview from 'src/components/sizePicker';
-import { fCurrency } from 'src/utils/formatNumber';
-import RootStyled from './styled';
+import ColorPreview from "src/components/colorPreview";
+import SizePreview from "src/components/sizePicker";
+import { fCurrency } from "src/utils/formatNumber";
+import RootStyled from "./styled";
 
 ProductDetailsSumaryMobile.propTypes = {
   product: PropTypes.object.isRequired,
@@ -62,13 +67,23 @@ const Incrementer = ({ ...props }) => {
 
   return (
     <Box className="incrementer">
-      <IconButton size="small" color="inherit" disabled={value <= 1} onClick={decrementQuantity}>
+      <IconButton
+        size="small"
+        color="inherit"
+        disabled={value <= 1}
+        onClick={decrementQuantity}
+      >
         <IoIosRemove />
       </IconButton>
       <Typography variant="body2" component="span" className="text">
         {value}
       </Typography>
-      <IconButton size="small" color="inherit" disabled={value >= available} onClick={incrementQuantity}>
+      <IconButton
+        size="small"
+        color="inherit"
+        disabled={value >= available}
+        onClick={incrementQuantity}
+      >
         <IoIosAdd />
       </IconButton>
     </Box>
@@ -78,7 +93,8 @@ Incrementer.propTypes = {
   available: PropTypes.number.isRequired
 };
 export default function ProductDetailsSumaryMobile({ ...props }) {
-  const { product, isLoading, totalReviews, totalRating, brand, category } = props;
+  const { product, isLoading, totalReviews, totalRating, brand, category } =
+    props;
   const [isClient, setIsClient] = useState(false);
   const [color, setColor] = useState(0);
   const [size, setSize] = useState(0);
@@ -95,10 +111,12 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
 
   const isMaxQuantity =
     !isLoading &&
-    checkout.cart.filter((item) => item._id === product?._id).map((item) => item.quantity)[0] >= product?.available;
+    checkout.cart
+      .filter((item) => item._id === product?._id)
+      .map((item) => item.quantity)[0] >= product?.available;
 
   const onAddCart = (param) => {
-    toast.success('Added to cart');
+    toast.success("Added to cart");
     dispatch(addCart(param));
   };
 
@@ -112,26 +130,32 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
     },
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const alreadyProduct = !isLoading && checkout.cart.filter((item) => item.pid === values.pid);
+        const alreadyProduct =
+          !isLoading && checkout.cart.filter((item) => item.pid === values.pid);
         if (!Boolean(alreadyProduct.length)) {
-          const colorSelected = product?.colors.find((_, index) => index === color);
-          const sizeSelected = product?.sizes.find((_, index) => index === size);
+          const colorSelected = product?.colors.find(
+            (_, index) => index === color
+          );
+          const sizeSelected = product?.sizes.find(
+            (_, index) => index === size
+          );
           onAddCart({
             pid: product._id,
             sku: product.sku,
             name: product.name,
             color: colorSelected,
+            type: "quick",
             size: sizeSelected,
             image: product?.images[0].url,
             quantity: values.quantity,
             price: product.priceSale === 0 ? product.price : product.priceSale,
             subtotal: (product.priceSale || product?.price) * values.quantity
           });
-          setFieldValue('quantity', 1);
+          setFieldValue("quantity", 1);
         }
 
         setSubmitting(false);
-        router.push('/cart');
+        router.push("/cart");
       } catch (error) {
         setSubmitting(false);
       }
@@ -142,9 +166,11 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
   const handleAddCart = () => {
     const colorSelected = product?.colors.find((_, index) => index === color);
     const sizeSelected = product?.sizes.find((_, index) => index === size);
+    alert('hi');
     onAddCart({
       pid: product._id,
       sku: product.sku,
+      type: "quick",
       color: colorSelected,
       name: product.name,
       image: product?.images[0].url,
@@ -153,13 +179,13 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
       price: product.priceSale === 0 ? product.price : product.priceSale,
       subtotal: (product.priceSale || product?.price) * values.quantity
     });
-    setFieldValue('quantity', 1);
+    setFieldValue("quantity", 1);
   };
 
   useEffect(() => {
     setLoaded(true);
   }, []);
-  const isMobile = useMediaQuery('(max-width:768px)');
+  const isMobile = useMediaQuery("(max-width:768px)");
   return (
     <RootStyled>
       <FormikProvider value={formik}>
@@ -167,10 +193,16 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
           <Typography noWrap variant="h4" paragraph className="heading">
             {product?.name}
           </Typography>
-          <Stack direction="row" alignItems="center" className="rating-wrapper" spacing={1}>
+          <Stack
+            direction="row"
+            alignItems="center"
+            className="rating-wrapper"
+            spacing={1}
+          >
             <Rating value={totalRating} precision={0.1} size="small" readOnly />
             <Typography variant="body1" color="primary">
-              {totalReviews} <span>{Number(totalReviews) > 1 ? 'Reviews' : 'Review'}</span>
+              {totalReviews}{" "}
+              <span>{Number(totalReviews) > 1 ? "Reviews" : "Review"}</span>
             </Typography>
 
             <Typography variant="h4" className="text-price">
@@ -188,22 +220,46 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
           <Stack spacing={1} my={3}>
             <Stack direction="row" alignItems="center" spacing={1} mt={1.5}>
               <Typography variant="subtitle1">Brand:</Typography>
-              <Typography variant="subtitle1" color="text.secondary" fontWeight={400}>
-                {brand?.name || 'Commercehope'}
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                fontWeight={400}
+              >
+                {brand?.name || "Commercehope"}
               </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={1}>
               <Typography variant="subtitle1">Category:</Typography>
-              <Typography variant="subtitle1" color="text.secondary" fontWeight={400}>
-                {category?.name || 'Commercehope'}
+              <Typography
+                variant="subtitle1"
+                color="text.secondary"
+                fontWeight={400}
+              >
+                {category?.name || "Commercehope"}
               </Typography>
             </Stack>
             {product?.price > product?.priceSale && (
               <Stack direction="row" alignItems="center" spacing={1}>
                 <Typography variant="subtitle1">Discount:</Typography>
-                <Typography variant="subtitle1" color="text.secondary" fontWeight={400} className="text-discount">
-                  {!isLoading && isLoaded && fCurrency(product?.price - product?.priceSale)}
-                  {<span>({(100 - (product?.priceSale / product?.price) * 100).toFixed(0)}% Discount)</span>}
+                <Typography
+                  variant="subtitle1"
+                  color="text.secondary"
+                  fontWeight={400}
+                  className="text-discount"
+                >
+                  {!isLoading &&
+                    isLoaded &&
+                    fCurrency(product?.price - product?.priceSale)}
+                  {
+                    <span>
+                      (
+                      {(
+                        100 -
+                        (product?.priceSale / product?.price) * 100
+                      ).toFixed(0)}
+                      % Discount)
+                    </span>
+                  }
                 </Typography>
               </Stack>
             )}
@@ -215,43 +271,68 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
                 fontWeight={400}
                 sx={{
                   span: {
-                    color: 'error.main'
+                    color: "error.main"
                   }
                 }}
               >
-                {product?.available > 0 ? `${product?.available} Items` : <span>Out of stock</span>}
+                {product?.available > 0 ? (
+                  `${product?.available} Items`
+                ) : (
+                  <span>Out of stock</span>
+                )}
               </Typography>
             </Stack>
             <Stack direction="row" alignItems="center" spacing={2} pt={1}>
               <Typography variant="subtitle1">Color:</Typography>
-              <ColorPreview color={color} setColor={setColor} colors={product?.colors} isDetail />
+              <ColorPreview
+                color={color}
+                setColor={setColor}
+                colors={product?.colors}
+                isDetail
+              />
             </Stack>
             <Stack direction="row" alignItems="center" spacing={2} pt={1}>
               <Typography variant="subtitle1">Size:</Typography>
-              <SizePreview size={size} setSize={setSize} sizes={product?.sizes} isDetail />
+              <SizePreview
+                size={size}
+                setSize={setSize}
+                sizes={product?.sizes}
+                isDetail
+              />
             </Stack>
           </Stack>
-          <Stack direction="row" alignItems="center" spacing={2} className="incrementer-wrapper">
+          <Stack
+            direction="row"
+            alignItems="center"
+            spacing={2}
+            className="incrementer-wrapper"
+          >
             <Typography variant="subtitle1">Quantity:</Typography>
             {isLoading ? (
-              <Box sx={{ float: 'right' }}>
+              <Box sx={{ float: "right" }}>
                 <Skeleton variant="rounded" width={120} height={40} />
               </Box>
             ) : (
               <div>
                 <Incrementer name="quantity" available={product?.available} />
                 {touched.quantity && errors.quantity && (
-                  <FormHelperText error>{touched.quantity && errors.quantity}</FormHelperText>
+                  <FormHelperText error>
+                    {touched.quantity && errors.quantity}
+                  </FormHelperText>
                 )}
               </div>
             )}
           </Stack>
           <Stack spacing={2} className="detail-actions-wrapper">
-            <Stack spacing={2} direction={{ xs: 'row', sm: 'row' }} className="contained-buttons">
+            <Stack
+              spacing={2}
+              direction={{ xs: "row", sm: "row" }}
+              className="contained-buttons"
+            >
               <Button
                 fullWidth
                 disabled={isMaxQuantity || isLoading || product?.available < 1}
-                size={isMobile ? 'medium' : 'large'}
+                size={isMobile ? "medium" : "large"}
                 type="button"
                 color="primary"
                 variant="contained"
@@ -263,7 +344,7 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
               <Button
                 disabled={isLoading || product?.available < 1}
                 fullWidth
-                size={isMobile ? 'medium' : 'large'}
+                size={isMobile ? "medium" : "large"}
                 type="submit"
                 variant="contained"
                 color="secondary"
@@ -278,30 +359,42 @@ export default function ProductDetailsSumaryMobile({ ...props }) {
                   aria-label="copy"
                   onClick={() => {
                     navigator.clipboard.writeText(window?.location.href);
-                    toast.success('Link copied.');
+                    toast.success("Link copied.");
                   }}
                 >
                   <MdContentCopy size={24} />
                 </IconButton>
                 {isClient && (
                   <>
-                    <WhatsappShareButton url={window?.location.href || ''}>
-                      <IconButton sx={{ color: '#42BC50' }} aria-label="whatsapp">
+                    <WhatsappShareButton url={window?.location.href || ""}>
+                      <IconButton
+                        sx={{ color: "#42BC50" }}
+                        aria-label="whatsapp"
+                      >
                         <IoLogoWhatsapp size={24} />
                       </IconButton>
                     </WhatsappShareButton>
-                    <FacebookShareButton url={window?.location.href || ''}>
-                      <IconButton sx={{ color: '#1373EC' }} aria-label="facebook">
+                    <FacebookShareButton url={window?.location.href || ""}>
+                      <IconButton
+                        sx={{ color: "#1373EC" }}
+                        aria-label="facebook"
+                      >
                         <FaFacebook size={24} />
                       </IconButton>
                     </FacebookShareButton>
-                    <TwitterShareButton url={window?.location.href || ''}>
-                      <IconButton sx={{ color: 'text.primary' }} aria-label="twitter">
+                    <TwitterShareButton url={window?.location.href || ""}>
+                      <IconButton
+                        sx={{ color: "text.primary" }}
+                        aria-label="twitter"
+                      >
                         <FaXTwitter size={24} />
                       </IconButton>
                     </TwitterShareButton>
-                    <LinkedinShareButton url={window?.location.href || ''}>
-                      <IconButton sx={{ color: '#0962B7' }} aria-label="linkedin">
+                    <LinkedinShareButton url={window?.location.href || ""}>
+                      <IconButton
+                        sx={{ color: "#0962B7" }}
+                        aria-label="linkedin"
+                      >
                         <FaLinkedin size={24} />
                       </IconButton>
                     </LinkedinShareButton>

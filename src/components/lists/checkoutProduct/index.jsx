@@ -39,7 +39,6 @@ const ThumbImgStyle = styled(Box)(({ theme }) => ({
 export default function CartProductList({ ...props }) {
   const { onDelete, onIncreaseQuantity, onDecreaseQuantity, isLoading, cart } =
     props;
-  console.log(props, "propesss");
 
   const cCurrency = useCurrencyConvert();
   const fCurrency = useCurrencyFormatter();

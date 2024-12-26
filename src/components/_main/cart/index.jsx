@@ -32,7 +32,7 @@ export default function CartMain() {
   const { checkout } = useSelector(({ product }) => product);
   const { cart } = checkout;
 
-  console.log('cart from frontend: ', cart);
+  console.log("cart from frontend: ", cart);
 
   const [loading, setLoading] = React.useState(true);
   const { mutate } = useMutation(api.getCart, {
@@ -41,6 +41,7 @@ export default function CartMain() {
       dispatch(getCart(res.data));
     },
     onError: (err) => {
+      console.error(err);
       const message = JSON.stringify(err.response.data.message);
       setLoading(false);
       // toast.error(message ? JSON.parse(message) : "Something went wrong!");

@@ -1,10 +1,15 @@
 // react
-'use client';
-import { useState, useEffect } from 'react';
-import { toast } from 'react-hot-toast';
-import { FacebookShareButton, TwitterShareButton, LinkedinShareButton, WhatsappShareButton } from 'next-share';
-import { useRouter } from 'next-nprogress-bar';
-import PropTypes from 'prop-types';
+"use client";
+import { useState, useEffect } from "react";
+import { toast } from "react-hot-toast";
+import {
+  FacebookShareButton,
+  TwitterShareButton,
+  LinkedinShareButton,
+  WhatsappShareButton
+} from "next-share";
+import { useRouter } from "next-nprogress-bar";
+import PropTypes from "prop-types";
 // mui
 import {
   Box,
@@ -20,44 +25,47 @@ import {
   Card,
   alpha,
   Divider
-} from '@mui/material';
-import LoadingButton from '@mui/lab/LoadingButton';
+} from "@mui/material";
+import LoadingButton from "@mui/lab/LoadingButton";
 
 // formik
-import { useFormik, Form, FormikProvider, useField } from 'formik';
+import { useFormik, Form, FormikProvider, useField } from "formik";
 // redux
-import { useDispatch, useSelector } from 'src/redux/store';
+import { useDispatch, useSelector } from "src/redux/store";
 // redux
-import { setWishlist } from 'src/redux/slices/wishlist';
-import { addCart } from 'src/redux/slices/product';
+import { setWishlist } from "src/redux/slices/wishlist";
+import { addCart } from "src/redux/slices/product";
 // api
-import * as api from 'src/services';
-import { useMutation } from 'react-query';
+import * as api from "src/services";
+import { useMutation } from "react-query";
 // styles
-import RootStyled from './styled';
+import RootStyled from "./styled";
 // components
-import ColorPreview from 'src/components/colorPreview';
-import SizePreview from 'src/components/sizePicker';
+import ColorPreview from "src/components/colorPreview";
+import SizePreview from "src/components/sizePicker";
 // hooks
-import { useCurrencyConvert } from 'src/hooks/convertCurrency';
-import { useCurrencyFormatter } from 'src/hooks/formatCurrency';
-import { addCompareProduct, removeCompareProduct } from '../../../../redux/slices/compare';
+import { useCurrencyConvert } from "src/hooks/convertCurrency";
+import { useCurrencyFormatter } from "src/hooks/formatCurrency";
+import {
+  addCompareProduct,
+  removeCompareProduct
+} from "../../../../redux/slices/compare";
 // icons
-import { IoIosAdd, IoIosRemove } from 'react-icons/io';
-import { IoLogoWhatsapp } from 'react-icons/io5';
-import { FaFacebook } from 'react-icons/fa';
-import { FaXTwitter } from 'react-icons/fa6';
-import { FaLinkedin } from 'react-icons/fa';
-import { MdContentCopy } from 'react-icons/md';
-import { LiaShippingFastSolid } from 'react-icons/lia';
-import { MdLockOutline } from 'react-icons/md';
-import { FaRegStar } from 'react-icons/fa';
-import { TbMessage } from 'react-icons/tb';
-import { MdOutlineShoppingBasket } from 'react-icons/md';
-import { FiShoppingCart } from 'react-icons/fi';
-import { IoBagCheckOutline } from 'react-icons/io5';
-import { FaRegHeart } from 'react-icons/fa';
-import { GoGitCompare } from 'react-icons/go';
+import { IoIosAdd, IoIosRemove } from "react-icons/io";
+import { IoLogoWhatsapp } from "react-icons/io5";
+import { FaFacebook } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
+import { FaLinkedin } from "react-icons/fa";
+import { MdContentCopy } from "react-icons/md";
+import { LiaShippingFastSolid } from "react-icons/lia";
+import { MdLockOutline } from "react-icons/md";
+import { FaRegStar } from "react-icons/fa";
+import { TbMessage } from "react-icons/tb";
+import { MdOutlineShoppingBasket } from "react-icons/md";
+import { FiShoppingCart } from "react-icons/fi";
+import { IoBagCheckOutline } from "react-icons/io5";
+import { FaRegHeart } from "react-icons/fa";
+import { GoGitCompare } from "react-icons/go";
 
 ProductDetailsSumary.propTypes = {
   product: PropTypes.object.isRequired,
@@ -87,13 +95,23 @@ const Incrementer = ({ ...props }) => {
 
   return (
     <Box className="incrementer">
-      <IconButton size="small" color="inherit" disabled={value <= 1} onClick={decrementQuantity}>
+      <IconButton
+        size="small"
+        color="inherit"
+        disabled={value <= 1}
+        onClick={decrementQuantity}
+      >
         <IoIosRemove />
       </IconButton>
       <Typography variant="body2" component="span" className="text">
         {value}
       </Typography>
-      <IconButton size="small" color="inherit" disabled={value >= available} onClick={incrementQuantity}>
+      <IconButton
+        size="small"
+        color="inherit"
+        disabled={value >= available}
+        onClick={incrementQuantity}
+      >
         <IoIosAdd />
       </IconButton>
     </Box>
@@ -127,10 +145,12 @@ export default function ProductDetailsSumary({ ...props }) {
 
   const isMaxQuantity =
     !isLoading &&
-    checkout.cart.filter((item) => item._id === product?._id).map((item) => item.quantity)[0] >= product?.available;
+    checkout.cart
+      .filter((item) => item._id === product?._id)
+      .map((item) => item.quantity)[0] >= product?.available;
 
   const onAddCart = (param) => {
-    toast.success('Added to cart');
+    toast.success("Added to cart");
     dispatch(addCart(param));
   };
 
@@ -150,7 +170,7 @@ export default function ProductDetailsSumary({ ...props }) {
   const onClickWishList = async (event) => {
     if (!isAuthenticated) {
       event.stopPropagation();
-      router.push('/auth/login');
+      router.push("/auth/login");
     } else {
       event.stopPropagation();
       setLoading(true);
@@ -168,10 +188,15 @@ export default function ProductDetailsSumary({ ...props }) {
     },
     onSubmit: async (values, { setSubmitting }) => {
       try {
-        const alreadyProduct = !isLoading && checkout.cart.filter((item) => item.pid === values.pid);
+        const alreadyProduct =
+          !isLoading && checkout.cart.filter((item) => item.pid === values.pid);
         if (!Boolean(alreadyProduct.length)) {
-          const colorSelected = product?.colors.find((_, index) => index === color);
-          const sizeSelected = product?.sizes.find((_, index) => index === size);
+          const colorSelected = product?.colors.find(
+            (_, index) => index === color
+          );
+          const sizeSelected = product?.sizes.find(
+            (_, index) => index === size
+          );
           onAddCart({
             pid: product._id,
             sku: product.sku,
@@ -183,11 +208,11 @@ export default function ProductDetailsSumary({ ...props }) {
             price: product.priceSale === 0 ? product.price : product.priceSale,
             subtotal: (product.priceSale || product?.price) * values.quantity
           });
-          setFieldValue('quantity', 1);
+          setFieldValue("quantity", 1);
         }
 
         setSubmitting(false);
-        router.push('/cart');
+        router.push("/cart");
       } catch (error) {
         setSubmitting(false);
       }
@@ -201,7 +226,9 @@ export default function ProductDetailsSumary({ ...props }) {
     onAddCart({
       pid: product._id,
       sku: product.sku,
+      name: product.name,
       color: colorSelected,
+      type: "quick",
       shop: product.shop,
       image: product?.images[0].url,
       size: sizeSelected,
@@ -209,7 +236,7 @@ export default function ProductDetailsSumary({ ...props }) {
       price: product.priceSale === 0 ? product.price : product.priceSale,
       subtotal: (product.priceSale || product?.price) * values.quantity
     });
-    setFieldValue('quantity', 1);
+    setFieldValue("quantity", 1);
   };
 
   useEffect(() => {
@@ -237,55 +264,125 @@ export default function ProductDetailsSumary({ ...props }) {
                 </Typography>
 
                 <Stack spacing={1} mt={1} mb={3}>
-                  <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={1}>
-                    <Stack direction="row" alignItems="center" className="rating-wrapper" spacing={1}>
-                      <Rating value={totalRating} precision={0.1} size="small" readOnly />
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={1}
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      className="rating-wrapper"
+                      spacing={1}
+                    >
+                      <Rating
+                        value={totalRating}
+                        precision={0.1}
+                        size="small"
+                        readOnly
+                      />
                       <Typography variant="subtitle2" color="text.secondary">
                         ({totalRating?.toFixed(1)})
                       </Typography>
                     </Stack>
-                    <Stack direction="row" alignItems="center" spacing={1} color="text.secondary">
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      color="text.secondary"
+                    >
                       <TbMessage size={18} />
                       <Typography variant="subtitle2" color="text.secondary">
-                        {product?.reviews.length}{' '}
-                        <span>{Number(product?.reviews.length) > 1 ? 'Reviews' : 'Review'}</span>
+                        {product?.reviews.length}{" "}
+                        <span>
+                          {Number(product?.reviews.length) > 1
+                            ? "Reviews"
+                            : "Review"}
+                        </span>
                       </Typography>
                     </Stack>
-                    <Stack direction="row" alignItems="center" spacing={1} color="text.secondary">
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      spacing={1}
+                      color="text.secondary"
+                    >
                       <MdOutlineShoppingBasket size={18} />
                       <Typography variant="subtitle2" color="text.secondary">
                         {product?.sold} sold
                       </Typography>
                     </Stack>
                   </Stack>
-                  <Stack direction="row" alignItems="center" spacing={1} mt={1.5}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    spacing={1}
+                    mt={1.5}
+                  >
                     <Typography variant="subtitle1">Brand:</Typography>
-                    <Typography variant="subtitle1" color="text.secondary" fontWeight={400}>
-                      {brand?.name || 'Nextall'}
+                    <Typography
+                      variant="subtitle1"
+                      color="text.secondary"
+                      fontWeight={400}
+                    >
+                      {brand?.name || "Nextall"}
                     </Typography>
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={1}>
                     <Typography variant="subtitle1">Category:</Typography>
-                    <Typography variant="subtitle1" color="text.secondary" fontWeight={400}>
-                      {category?.name || 'Nextall'}
+                    <Typography
+                      variant="subtitle1"
+                      color="text.secondary"
+                      fontWeight={400}
+                    >
+                      {category?.name || "Nextall"}
                     </Typography>
                   </Stack>
                   {product?.price > product?.priceSale && (
                     <Stack direction="row" alignItems="center" spacing={1}>
                       <Typography variant="subtitle1">Discount:</Typography>
-                      <Typography variant="subtitle1" color="text.secondary" fontWeight={400} className="text-discount">
-                        {!isLoading && isLoaded && fCurrency(cCurrency(product?.price - product?.priceSale))}
-                        {<span>({(100 - (product?.priceSale / product?.price) * 100).toFixed(0)}% Discount)</span>}
+                      <Typography
+                        variant="subtitle1"
+                        color="text.secondary"
+                        fontWeight={400}
+                        className="text-discount"
+                      >
+                        {!isLoading &&
+                          isLoaded &&
+                          fCurrency(
+                            cCurrency(product?.price - product?.priceSale)
+                          )}
+                        {
+                          <span>
+                            (
+                            {(
+                              100 -
+                              (product?.priceSale / product?.price) * 100
+                            ).toFixed(0)}
+                            % Discount)
+                          </span>
+                        }
                       </Typography>
                     </Stack>
                   )}
                   <Stack direction="row" alignItems="center" spacing={2} pt={1}>
                     <Typography variant="subtitle1">Color:</Typography>
-                    <ColorPreview color={color} setColor={setColor} colors={product?.colors} isDetail />
+                    <ColorPreview
+                      color={color}
+                      setColor={setColor}
+                      colors={product?.colors}
+                      isDetail
+                    />
                   </Stack>
                   <Stack direction="row" alignItems="center" spacing={2} pt={1}>
                     <Typography variant="subtitle1">Size:</Typography>
-                    <SizePreview size={size} setSize={setSize} sizes={product?.sizes} isDetail />
+                    <SizePreview
+                      size={size}
+                      setSize={setSize}
+                      sizes={product?.sizes}
+                      isDetail
+                    />
                   </Stack>
                 </Stack>
                 <Typography variant="subtitle1">Description:</Typography>
@@ -293,25 +390,45 @@ export default function ProductDetailsSumary({ ...props }) {
               </Card>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Card sx={{ p: 2, position: 'sticky', top: 156 }}>
+              <Card sx={{ p: 2, position: "sticky", top: 156 }}>
                 <Typography variant="h4" className="text-price">
-                  {!isLoading && isLoaded && fCurrency(cCurrency(product?.priceSale))} &nbsp;
+                  {!isLoading &&
+                    isLoaded &&
+                    fCurrency(cCurrency(product?.priceSale))}{" "}
+                  &nbsp;
                   {product?.price <= product?.priceSale ? null : (
-                    <Typography component="span" className="old-price" color="text.secondary">
-                      {!isLoading && isLoaded && fCurrency(cCurrency(product?.price))}
+                    <Typography
+                      component="span"
+                      className="old-price"
+                      color="text.secondary"
+                    >
+                      {!isLoading &&
+                        isLoaded &&
+                        fCurrency(cCurrency(product?.price))}
                     </Typography>
                   )}
                 </Typography>
-                <Stack direction="row" alignItems="center" spacing={1} className="incrementer-wrapper" my={2}>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  spacing={1}
+                  className="incrementer-wrapper"
+                  my={2}
+                >
                   {isLoading ? (
-                    <Box sx={{ float: 'right' }}>
+                    <Box sx={{ float: "right" }}>
                       <Skeleton variant="rounded" width={120} height={40} />
                     </Box>
                   ) : (
                     <div>
-                      <Incrementer name="quantity" available={product?.available} />
+                      <Incrementer
+                        name="quantity"
+                        available={product?.available}
+                      />
                       {touched.quantity && errors.quantity && (
-                        <FormHelperText error>{touched.quantity && errors.quantity}</FormHelperText>
+                        <FormHelperText error>
+                          {touched.quantity && errors.quantity}
+                        </FormHelperText>
                       )}
                     </div>
                   )}
@@ -321,18 +438,24 @@ export default function ProductDetailsSumary({ ...props }) {
                     fontWeight={400}
                     sx={{
                       span: {
-                        color: 'error.main'
+                        color: "error.main"
                       }
                     }}
                   >
-                    {product?.available > 0 ? `${product?.available} Items` : <span>Out of stock</span>}
+                    {product?.available > 0 ? (
+                      `${product?.available} Items`
+                    ) : (
+                      <span>Out of stock</span>
+                    )}
                   </Typography>
                 </Stack>
 
                 <Stack spacing={1} className="contained-buttons" mb={2}>
                   <Button
                     fullWidth
-                    disabled={isMaxQuantity || isLoading || product?.available < 1}
+                    disabled={
+                      isMaxQuantity || isLoading || product?.available < 1
+                    }
                     // size={isMobile ? 'medium' : 'large'}
                     type="button"
                     color="primary"
@@ -340,9 +463,11 @@ export default function ProductDetailsSumary({ ...props }) {
                     onClick={() => handleAddCart(product)}
                     startIcon={<FiShoppingCart />}
                     sx={{
-                      background: (theme) => alpha(theme.palette.primary.main, 0.3),
-                      ':hover': {
-                        background: (theme) => alpha(theme.palette.primary.main, 0.3)
+                      background: (theme) =>
+                        alpha(theme.palette.primary.main, 0.3),
+                      ":hover": {
+                        background: (theme) =>
+                          alpha(theme.palette.primary.main, 0.3)
                       }
                     }}
                   >
@@ -385,7 +510,8 @@ export default function ProductDetailsSumary({ ...props }) {
                     </LoadingButton>
                   )}
 
-                  {compareProducts?.filter((v) => v._id === product._id).length > 0 ? (
+                  {compareProducts?.filter((v) => v._id === product._id)
+                    .length > 0 ? (
                     <Button
                       startIcon={<GoGitCompare />}
                       fullWidth
@@ -409,13 +535,17 @@ export default function ProductDetailsSumary({ ...props }) {
                     </Button>
                   )}
 
-                  <Stack direction="row" spacing={0.5} justifyContent={'center'}>
+                  <Stack
+                    direction="row"
+                    spacing={0.5}
+                    justifyContent={"center"}
+                  >
                     <Tooltip title="Copy Prooduct URL">
                       <IconButton
                         aria-label="copy"
                         onClick={() => {
                           navigator.clipboard.writeText(window?.location.href);
-                          toast.success('Link copied.');
+                          toast.success("Link copied.");
                         }}
                       >
                         <MdContentCopy size={24} />
@@ -424,29 +554,47 @@ export default function ProductDetailsSumary({ ...props }) {
                     {isClient && (
                       <>
                         <Tooltip title="Share on WhatsApp">
-                          <WhatsappShareButton url={window?.location.href || ''}>
-                            <IconButton sx={{ color: '#42BC50' }} aria-label="whatsapp">
+                          <WhatsappShareButton
+                            url={window?.location.href || ""}
+                          >
+                            <IconButton
+                              sx={{ color: "#42BC50" }}
+                              aria-label="whatsapp"
+                            >
                               <IoLogoWhatsapp size={24} />
                             </IconButton>
                           </WhatsappShareButton>
                         </Tooltip>
                         <Tooltip title="Share on Facebook">
-                          <FacebookShareButton url={window?.location.href || ''}>
-                            <IconButton sx={{ color: '#1373EC' }} aria-label="facebook">
+                          <FacebookShareButton
+                            url={window?.location.href || ""}
+                          >
+                            <IconButton
+                              sx={{ color: "#1373EC" }}
+                              aria-label="facebook"
+                            >
                               <FaFacebook size={24} />
                             </IconButton>
                           </FacebookShareButton>
                         </Tooltip>
                         <Tooltip title="Share on Twitter">
-                          <TwitterShareButton url={window?.location.href || ''}>
-                            <IconButton sx={{ color: 'text.primary' }} aria-label="twitter">
+                          <TwitterShareButton url={window?.location.href || ""}>
+                            <IconButton
+                              sx={{ color: "text.primary" }}
+                              aria-label="twitter"
+                            >
                               <FaXTwitter size={24} />
                             </IconButton>
                           </TwitterShareButton>
                         </Tooltip>
                         <Tooltip title="Share on LinkedIn">
-                          <LinkedinShareButton url={window?.location.href || ''}>
-                            <IconButton sx={{ color: '#0962B7' }} aria-label="linkedin">
+                          <LinkedinShareButton
+                            url={window?.location.href || ""}
+                          >
+                            <IconButton
+                              sx={{ color: "#0962B7" }}
+                              aria-label="linkedin"
+                            >
                               <FaLinkedin size={24} />
                             </IconButton>
                           </LinkedinShareButton>
@@ -465,7 +613,7 @@ export default function ProductDetailsSumary({ ...props }) {
                     spacing={1}
                     my={1}
                     sx={{
-                      color: 'text.secondary'
+                      color: "text.secondary"
                     }}
                   >
                     {item.icon}
@@ -486,14 +634,14 @@ export default function ProductDetailsSumary({ ...props }) {
 const shippingData = [
   {
     icon: <LiaShippingFastSolid size={20} />,
-    name: 'Worldwide shipping'
+    name: "Worldwide shipping"
   },
   {
     icon: <MdLockOutline size={20} />,
-    name: 'Secure payment'
+    name: "Secure payment"
   },
   {
     icon: <FaRegStar size={20} />,
-    name: '2 years full warranty'
+    name: "2 years full warranty"
   }
 ];

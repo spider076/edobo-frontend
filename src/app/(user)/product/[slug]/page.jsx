@@ -46,6 +46,8 @@ export default async function ProductDetail({ params: { slug } }) {
 
   const { data, totalRating, totalReviews, brand, category } = response;
 
+  console.log('data : ', data);
+
   return (
     <Box>
       <Container maxWidth="xl">
