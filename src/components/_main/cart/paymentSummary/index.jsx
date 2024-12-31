@@ -1,5 +1,5 @@
 'use client';
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { useRouter } from 'next-nprogress-bar';
 import Image from 'next/image';
@@ -13,6 +13,7 @@ import { useCurrencyFormatter } from 'src/hooks/formatCurrency';
 import RootStyled from './styled';
 // images
 import paymentImg from '../../../../../public/images/payment-method.png';
+import LoginPopover from 'src/components/popover/login';
 
 PaymentSummary.propTypes = {
   loading: PropTypes.bool.isRequired
@@ -21,6 +22,11 @@ PaymentSummary.propTypes = {
 export default function PaymentSummary({ loading, cart }) {
   const { product } = useSelector((state) => state);
   const { total, shipping, subtotal } = product.checkout;
+  const { isAuthenticated } = useSelector((state) => state.user);
+  const [openLogin, setOpenLogin] = useState(false);
+
+  useEffect(() => {
+  }, [isAuthenticated]);
 
   const router = useRouter();
 
@@ -71,18 +77,23 @@ export default function PaymentSummary({ loading, cart }) {
         </Box>
         <Box mt={2}>
           <LoadingButton
-            variant="contained"
             fullWidth
             size="large"
-            sx={{
-              borderRadius: '8px'
-            }}
-            disabled={isEmptyCart}
+            type="submit"
+            variant="contained"
             loading={loading}
-            onClick={() => router.push('/checkout')}
+            onClick={() => isAuthenticated ? router.push('/checkout') : setOpenLogin(true)}
+            sx={{
+              bgcolor: isAuthenticated ? undefined : '#509c04',
+              '&:hover': {
+                bgcolor: isAuthenticated ? undefined : '#2E865F'
+              }
+            }}
           >
-            Checkout
+            {isAuthenticated ? 'Checkout' : 'Login to checkout'}
           </LoadingButton>
+
+          <LoginPopover open={openLogin} onClose={() => setOpenLogin(false)} />
         </Box>
       </CardContent>
     </RootStyled>

@@ -49,10 +49,10 @@ export default async function ProductDetail({ params: { slug } }) {
   console.log('data : ', data);
 
   return (
-    <Box>
+    <Box marginTop={2}>
       <Container maxWidth="xl">
         <Stack gap={5}>
-          <HeaderBreadcrumbs
+          {/* <HeaderBreadcrumbs
             heading="Product Details"
             links={[
               {
@@ -67,7 +67,7 @@ export default async function ProductDetail({ params: { slug } }) {
                 name: data?.name
               }
             ]}
-          />
+          /> */}
           <Grid container spacing={2} justifyContent="center">
             <Grid item xs={12} sm={6} md={4} lg={4}>
               <ProductDetailsCarousel slug={slug} product={data} data={data} />

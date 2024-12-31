@@ -31,6 +31,7 @@ import { useCurrencyConvert } from 'src/hooks/convertCurrency';
 // paypal
 import { PayPalScriptProvider } from '@paypal/react-paypal-js';
 import Razorpay from 'razorpay';
+import axios from 'axios';
 // dynamic components
 const CheckoutForm = dynamic(() => import('src/components/forms/checkout'), {
   loading: () => <CheckoutGuestFormSkeleton />
@@ -56,6 +57,28 @@ const initialOptions = {
   intent: 'capture'
 };
 
+// Razorpay Configuration
+const RAZORPAY_CONFIG = {
+  key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID || 'rzp_test_Pu2pvCuPYnstgx', // Fallback to test key
+  currency: 'INR',
+  name: process.env.NEXT_PUBLIC_BUSINESS_NAME || 'Edobo Medical',
+  description: 'Order Payment',
+  image: '/logo.png',
+  theme: {
+    color: '#F37254'
+  }
+};
+
+const loadRazorpayScript = () => {
+  return new Promise((resolve) => {
+    const script = document.createElement('script');
+    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+    script.async = true;
+    script.onload = () => resolve(true);
+    document.body.appendChild(script);
+  });
+};
+
 const CheckoutMain = () => {
   const router = useRouter();
   const cCurrency = useCurrencyConvert();
@@ -78,41 +101,79 @@ const CheckoutMain = () => {
   const [totalWithDiscount, setTotalWithDiscount] = useState(null);
   const elements = useElements();
   const stripe = useStripe();
-  const { mutate, isLoading } = useMutation('order', api.placeOrder, {
-    onSuccess: (data) => {
-      toast.success('Order placed!');
-      setProcessingTo(false);
-      router.push(`/order/${data.orderId}`);
-      dispatch(resetCart());
-    },
-    onError: (err) => {
-      toast.error(err.response.data.message || 'Something went wrong');
-      setProcessingTo(false);
-    }
-  });
 
-  const [loading, setLoading] = React.useState(true);
-  const { mutate: getCartMutate } = useMutation(api.getCart, {
-    onSuccess: (res) => {
-      dispatch(getCart(res.data));
-      setLoading(false);
+  // Combine both mutations into a single one for better state management
+  const { mutate: handleOrder, isLoading: isOrderProcessing } = useMutation(
+    async (orderData) => {
+      if (orderData.paymentMethod === 'razorpay') {
+        const orderResponse = await api.placeOrder(orderData);
+        if (orderResponse.success) {
+          return handleRazorpayPayment(orderResponse, orderData);
+        }
+        throw new Error(orderResponse.message || 'Failed to create order');
+      }
+      return api.placeOrder(orderData);
     },
-    onError: (err) => {
-      const message = JSON.stringify(err.response.data.message);
-      setLoading(false);
-      toast.error(message ? JSON.parse(message) : 'Something went wrong!');
+    {
+      onSuccess: (data) => {
+        toast.success('Order placed successfully!');
+        setProcessingTo(false);
+        router.push(`/order/${data.orderId}`);
+        dispatch(resetCart());
+      },
+      onError: (error) => {
+        toast.error(error.message || 'Something went wrong');
+        setProcessingTo(false);
+      }
     }
-  });
+  );
 
-  React.useEffect(() => {
-    formik.validateForm();
-    if (cart.length < 1) {
-      router.push('/');
-    } else {
-      setLoading(true);
-      getCartMutate(cart);
-    }
-  }, []);
+  // Separate Razorpay payment logic
+  const handleRazorpayPayment = async (razorpayData, orderData) => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        // Ensure Razorpay script is loaded
+        await loadRazorpayScript();
+
+        // Check if Razorpay is properly loaded
+        if (!window.Razorpay) {
+          throw new Error('Razorpay SDK failed to load');
+        }
+
+        const options = {
+          ...RAZORPAY_CONFIG,
+          amount: Math.round(cCurrency(totalWithDiscount || checkout.total) * 100), // Ensure amount is rounded
+          order_id: razorpayData.orderId,
+          prefill: {
+            name: `${values.firstName} ${values.lastName}`,
+            email: values.email,
+            contact: values.phone
+          },
+          handler: function (response) {
+            resolve({
+              ...orderData,
+              paymentId: response.razorpay_payment_id,
+              orderId: razorpayData.orderId
+            });
+          },
+          modal: {
+            ondismiss: () => {
+              reject(new Error('Payment cancelled by user'));
+            }
+          }
+        };
+
+        const razorpayInstance = new window.Razorpay(options);
+        razorpayInstance.on('payment.failed', function (response) {
+          reject(new Error(response.error.description || 'Payment failed'));
+        });
+        razorpayInstance.open();
+      } catch (error) {
+        console.error('Razorpay Error:', error);
+        reject(new Error(error.message || 'Failed to initialize Razorpay'));
+      }
+    });
+  };
 
   const NewAddressSchema = Yup.object().shape({
     firstName: Yup.string().required('First name is required'),
@@ -126,16 +187,16 @@ const CheckoutMain = () => {
     zip: Yup.string().required('Postal is required'),
     shippingAddress: checked
       ? Yup.object().shape({
-          firstName: Yup.string().required('First name is required'),
-          lastName: Yup.string().required('Last name is required'),
-          phone: Yup.string().required('Phone is required'),
-          email: Yup.string().email('Enter email Valid').required('Email is required'),
-          address: Yup.string().required('Address is required'),
-          city: Yup.string().required('City is required'),
-          state: Yup.string().required('State is required'),
-          country: Yup.string().required('Country is required'),
-          zip: Yup.string().required('Postal is required')
-        })
+        firstName: Yup.string().required('First name is required'),
+        lastName: Yup.string().required('Last name is required'),
+        phone: Yup.string().required('Phone is required'),
+        email: Yup.string().email('Enter email Valid').required('Email is required'),
+        address: Yup.string().required('Address is required'),
+        city: Yup.string().required('City is required'),
+        state: Yup.string().required('State is required'),
+        country: Yup.string().required('Country is required'),
+        zip: Yup.string().required('Postal is required')
+      })
       : Yup.string().nullable().notRequired()
   });
 
@@ -167,92 +228,55 @@ const CheckoutMain = () => {
     enableReinitialize: true,
     validationSchema: NewAddressSchema,
     onSubmit: async (values) => {
-      console.log('button pressed', values);
-      const items = cart.map(({ ...others }) => others);
-      const totalItems = sum(items.map((item) => item.quantity));
+      try {
+        setProcessingTo(true);
+        setCheckoutError(null);
 
-      const data = {
-        paymentMethod: paymentMethod,
-        items: items,
-        user: values,
-        totalItems,
-        couponCode,
-        currency,
-        conversionRate: rate,
-        shipping: process.env.SHIPPING_FEE || 0
-      };
+        const items = cart.map(({ ...others }) => others);
+        const totalItems = sum(items.map((item) => item.quantity));
 
-      if (data.paymentMethod === 'razorpay') {
-        onRazorpaySubmit(data);
-      } else {
-        mutate(data);
+        const orderData = {
+          paymentMethod,
+          items,
+          user: values,
+          totalItems,
+          couponCode,
+          shipping: process.env.NEXT_PUBLIC_SHIPPING_FEE || 0
+        };
+
+        handleOrder(orderData);
+      } catch (error) {
+        setProcessingTo(false);
+        setCheckoutError(error.message || 'Checkout failed');
       }
     }
   });
 
   const { errors, values, touched, handleSubmit, getFieldProps, isValid } = formik;
 
-  const onRazorpaySubmit = async (data) => {
-    try {
-      console.log('Opening Razorpay checkout...');
-      setProcessingTo(true); // Set loading state
-      setCheckoutError(null); // Reset checkout errors
-
-      // Find selected country from available countries
-      const selected = countries.find((v) => v.label.toLowerCase() === values.country.toLowerCase());
-
-      // Prepare billing details
-      const billingDetails = {
-        name: `${values.firstName} ${values.lastName}`,
-        email: values.email,
-        address: {
-          city: values.city,
-          line1: values.address,
-          state: values.state,
-          postal_code: values.zip,
-          country: selected?.code.toLowerCase() || 'in' // Default to 'in' if country code is not found
-        }
-      };
-
-      // Razorpay payment options
-      const options = {
-        key: 'rzp_test_Pu2pvCuPYnstgx', // Replace with your Razorpay key
-        amount: cCurrency(totalWithDiscount || checkout.total) * 100, // Convert amount to paise
-        currency: 'INR', // Currency type, e.g., 'INR'
-        name: 'Your Business Name', // Business name
-        description: 'Order Payment', // Payment description
-        image: '/logo.png', // Business logo
-        order_id: '135121313', // Razorpay order ID
-        prefill: {
-          name: `${values.firstName} ${values.lastName}`,
-          email: values.email,
-          contact: values.phone // Prefill contact details
-        },
-        handler: function (response) {
-          // Handle Razorpay payment response
-          mutate({
-            ...data,
-            paymentMethod: 'Razorpay',
-            paymentId: response.razorpay_payment_id // Capture payment ID
-          });
-        },
-        theme: {
-          color: '#F37254' // Customize theme color
-        }
-      };
-
-      // Ensure Razorpay instance is created only if options are correct
-      if (!options.key) {
-        throw new Error('Razorpay key is missing!');
-      }
-
-      const razorpayInstance = new Razorpay(options); // Create Razorpay instance
-      razorpayInstance.open(); // Open Razorpay payment modal
-    } catch (error) {
-      setProcessingTo(false); // Stop processing state
-      setCheckoutError(error.message || 'An error occurred during the checkout process');
+  const { mutate: getCartMutate } = useMutation(api.getCart, {
+    onSuccess: (res) => {
+      dispatch(getCart(res.data));
+      setLoading(false);
+    },
+    onError: (err) => {
+      const message = JSON.stringify(err.response.data.message);
+      setLoading(false);
+      toast.error(message ? JSON.parse(message) : 'Something went wrong!');
     }
-  };
+  });
+
+  React.useEffect(() => {
+    formik.validateForm();
+    if (cart.length < 1) {
+      router.push('/');
+    } else {
+      setLoading(true);
+      getCartMutate(cart);
+    }
+  }, []);
+
+  const [loading, setLoading] = React.useState(true);
 
   return (
     <FormikProvider value={formik}>
@@ -288,7 +312,7 @@ const CheckoutMain = () => {
                   fullWidth
                   size="large"
                   type="submit"
-                  loading={isLoading || isProcessing || loading}
+                  loading={isOrderProcessing || isProcessing || loading}
                 >
                   Place Order
                 </LoadingButton>

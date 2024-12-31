@@ -8,10 +8,13 @@ import { BiUser, BiUserCircle } from "react-icons/bi";
 import { useSelector } from "react-redux";
 import { UserList } from "src/components/lists";
 import MenuPopover from "src/components/popover/popover";
+import { useMediaQuery } from "@mui/material";
 
 const MobileNav = () => {
   const { user, isAuthenticated } = useSelector(({ user }) => user);
   const [openUser, setOpen] = React.useState(false);
+
+  const isMobile = useMediaQuery("(max-width:768px)");
 
   const router = useRouter();
   const anchorRef = React.useRef(null);
@@ -27,6 +30,10 @@ const MobileNav = () => {
   const handleCloseUser = () => {
     setOpen(false);
   };
+
+  if (!isMobile) {
+    return null;
+  }
 
   return (
     <Box>

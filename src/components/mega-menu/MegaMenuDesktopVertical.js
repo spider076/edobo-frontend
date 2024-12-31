@@ -98,43 +98,45 @@ export default function MegaMenuDesktopVertical({ ...other }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
   return (
-    <List
-      component={Card}
-      disablePadding
-      {...other}
-      sx={{
-        minWidth: 280,
-        bgcolor: 'background.paper',
-        borderRadius: '12px',
-        height: 343,
-        overflowY: 'auto',
-        overflowX: 'auto',
-        border: (theme) => `1px solid ${theme.palette.divider}`,
-        display: { md: 'flex', xs: 'none' },
-        flexDirection: 'column',
-        justifyContent: 'space-between'
-      }}
-    >
-      <div>
-        {(isLoading ? Array.from(new Array(5)) : data?.data.slice(0, 5) || []).map((shop, i) => (
-          <MegaMenuItem key={Math.random()} isLoading={isLoading} shop={shop} isLast={i === 4} />
-        ))}
-      </div>
-      <Button
-        variant="outlined"
-        fullWidth
-        onClick={() => router.push('/shops')}
-        endIcon={<FaAngleRight size={14} />}
-        sx={{
-          bgcolor: (theme) => alpha(theme.palette.primary.dark, 0.2) + '!important',
-          color: (theme) => theme.palette.primary.dark,
-          border: 'none !important',
-          borderRadius: 'unset',
-          paddingY: (theme) => theme.spacing(3.5)
-        }}
-      >
-        View All
-      </Button>
-    </List>
+    <></>
+    // Shops list
+    // <List
+    //   component={Card}
+    //   disablePadding
+    //   {...other}
+    //   sx={{
+    //     minWidth: 280,
+    //     bgcolor: 'background.paper',
+    //     borderRadius: '12px',
+    //     height: 343,
+    //     overflowY: 'auto',
+    //     overflowX: 'auto',
+    //     border: (theme) => `1px solid ${theme.palette.divider}`,
+    //     display: { md: 'flex', xs: 'none' },
+    //     flexDirection: 'column',
+    //     justifyContent: 'space-between'
+    //   }}
+    // >
+    //   <div>
+    //     {(isLoading ? Array.from(new Array(5)) : data?.data.slice(0, 5) || []).map((shop, i) => (
+    //       <MegaMenuItem key={Math.random()} isLoading={isLoading} shop={shop} isLast={i === 4} />
+    //     ))}
+    //   </div>
+    //   <Button
+    //     variant="outlined"
+    //     fullWidth
+    //     onClick={() => router.push('/shops')}
+    //     endIcon={<FaAngleRight size={14} />}
+    //     sx={{
+    //       bgcolor: (theme) => alpha(theme.palette.primary.dark, 0.2) + '!important',
+    //       color: (theme) => theme.palette.primary.dark,
+    //       border: 'none !important',
+    //       borderRadius: 'unset',
+    //       paddingY: (theme) => theme.spacing(3.5)
+    //     }}
+    //   >
+    //     View All
+    //   </Button>
+    // </List>
   );
 }

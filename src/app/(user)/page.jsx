@@ -62,12 +62,12 @@ export default function IndexPage() {
       <Banner />
       <Container maxWidth="xl">
         <TopCollection />
-        <Shops />
-        <FeaturedProducts />
+        {/* <Shops /> */}
+        {/* <FeaturedProducts /> */}
       </Container>
       <Testimonials />
       <Container maxWidth="xl">
-        <Brands />
+        {/* <Brands /> */}
       </Container>
       {/* <SubscriptionModal /> */}
     </>
