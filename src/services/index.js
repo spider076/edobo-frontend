@@ -326,10 +326,15 @@ export const getIncomeByVendor = async (slug, page) => {
   return data;
 };
 
-export const getProducts = async (query = '', cat, rate) => {
-  const { data } = await http.get(`/products${query || '?'}&rate=${rate}`);
+export const getProducts = async (query = '', rate, city) => {
+  const params = new URLSearchParams(query.replace('?', ''));
+  if (rate) params.append('rate', rate);
+  if (city) params.append('city', city.trim());
+  const queryString = params.toString() ? `?${params.toString()}` : '';
+  const { data } = await http.get(`/products${queryString}`);
   return data;
 };
+
 export const getProductDetails = async (pid) => {
   const { data } = await http.get(`/products/${pid}`);
   return data;

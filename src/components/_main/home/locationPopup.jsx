@@ -89,6 +89,37 @@ const LocationPopup = ({ onClose }) => {
         };
         setLocationAccess(coords);
         setSearchInput(place.formatted_address || "");
+        
+        // Extract address components
+        const addressComponents = place.address_components;
+        const newAddress = {
+          street: "",
+          city: "",
+          state: "",
+          postalCode: "",
+          country: ""
+        };
+
+        addressComponents.forEach(component => {
+          const type = component.types[0];
+          if (type === "street_number" || type === "route") {
+            newAddress.street += component.long_name + " ";
+          }
+          if (type === "locality") {
+            newAddress.city = component.long_name;
+          }
+          if (type === "administrative_area_level_1") {
+            newAddress.state = component.long_name;
+          }
+          if (type === "postal_code") {
+            newAddress.postalCode = component.long_name;
+          }
+          if (type === "country") {
+            newAddress.country = component.long_name;
+          }
+        });
+
+        setAddress(newAddress);
       }
     }
   };
@@ -101,9 +132,17 @@ const LocationPopup = ({ onClose }) => {
   };
 
   const handleSubmit = () => {
-    dispatch(setLocation(searchInput));
-    window.localStorage.setItem("location", JSON.stringify(searchInput));
-    console.log("Address Submitted:", address);
+    const locationData = {
+      fullAddress: searchInput,
+      coordinates: locationAccess,
+      ...address
+    };
+    
+    // Dispatch to Redux and save to localStorage
+    dispatch(setLocation(locationData));
+    window.localStorage.setItem("location", JSON.stringify(locationData));
+    
+    console.log("Address Submitted:", locationData);
     onClose();
   };
 
@@ -128,10 +167,11 @@ const LocationPopup = ({ onClose }) => {
         maxWidth: "600px",
         p: 2,
         bgcolor: "white",
+        color: "black",
         boxShadow: 3,
         borderRadius: 2,
         zIndex: 1000,
-        textAlign: "center"
+        textAlign: "center",
       }}
     >
       <IconButton
@@ -180,6 +220,10 @@ const LocationPopup = ({ onClose }) => {
                 <TextField
                   label="Search Location"
                   variant="outlined"
+                  InputProps={{
+                    style: { color: "black" }
+                  }}
+                  color="primary"
                   fullWidth
                   value={searchInput}
                   onChange={(e) => setSearchInput(e.target.value)}
@@ -219,6 +263,9 @@ const LocationPopup = ({ onClose }) => {
               label="Street"
               name="street"
               value={address.street}
+              InputProps={{
+                style: { color: "black" }
+              }}
               onChange={handleChange}
               variant="outlined"
               fullWidth
@@ -227,6 +274,9 @@ const LocationPopup = ({ onClose }) => {
             <TextField
               label="City"
               name="city"
+              InputProps={{
+                style: { color: "black" }
+              }}
               value={address.city}
               onChange={handleChange}
               variant="outlined"
@@ -236,6 +286,9 @@ const LocationPopup = ({ onClose }) => {
             <TextField
               label="State"
               name="state"
+              InputProps={{
+                style: { color: "black" }
+              }}
               value={address.state}
               onChange={handleChange}
               variant="outlined"
@@ -245,6 +298,9 @@ const LocationPopup = ({ onClose }) => {
             <TextField
               label="Postal Code"
               name="postalCode"
+              InputProps={{
+                style: { color: "black" }
+              }}
               value={address.postalCode}
               onChange={handleChange}
               variant="outlined"
@@ -254,6 +310,9 @@ const LocationPopup = ({ onClose }) => {
             <TextField
               label="Country"
               name="country"
+              InputProps={{
+                style: { color: "black" }
+              }}
               value={address.country}
               onChange={handleChange}
               variant="outlined"

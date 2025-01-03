@@ -12,6 +12,7 @@ import { useQuery } from 'react-query';
 // components
 import ProductCard from 'src/components/cards/product';
 import TodayCountDown from '../todayCountDown';
+import { useSelector } from 'react-redux';
 
 export default function TopCollections() {
   const { data, isLoading } = useQuery(['get-best-products'], () => api.getTopRatedProducts());

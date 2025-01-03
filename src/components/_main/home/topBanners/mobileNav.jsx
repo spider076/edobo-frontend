@@ -9,22 +9,25 @@ import { useSelector } from "react-redux";
 import { UserList } from "src/components/lists";
 import MenuPopover from "src/components/popover/popover";
 import { useMediaQuery } from "@mui/material";
+import LoginPopover from "src/components/popover/login";
+import LocationPopup from "../locationPopup";
 
 const MobileNav = () => {
   const { user, isAuthenticated } = useSelector(({ user }) => user);
   const [openUser, setOpen] = React.useState(false);
+  const [openLogin, setOpenLogin] = React.useState(false);
 
   const isMobile = useMediaQuery("(max-width:768px)");
+
+  const [showLocationPopup, setShowLocationPopup] = React.useState(true);
+
+  const handleLocationPopupClose = () => setShowLocationPopup(false);
 
   const router = useRouter();
   const anchorRef = React.useRef(null);
 
   const handleOpenUser = () => {
-    if (!isAuthenticated) {
-      router.push("/auth/login");
-    } else {
-      setOpen(true);
-    }
+    setShowLocationPopup(true);
   };
 
   const handleCloseUser = () => {
@@ -61,7 +64,7 @@ const MobileNav = () => {
             <span
               style={{ marginLeft: 2, fontWeight: 600, cursor: "pointer" }}
               onClick={() => {
-                router.push("/auth/login");
+                setOpenLogin(true);
               }}
             >
               {!isAuthenticated && "( Login )"}
@@ -72,20 +75,24 @@ const MobileNav = () => {
             fontWeight={400}
             fontSize={15}
             color="error"
+            style={{
+              display: "flex",
+              alignItems: "end"
+            }}
           >
             Deliver to{" "}
             <span
               onClick={handleOpenUser}
               style={{
-                marginLeft: 2,
+                marginLeft: 4,
                 fontWeight: 600,
-                cursor: "pointer"
+                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
               }}
             >
               Select the pincode
-              <span style={{ marginLeft: 0.5, margin: "auto" }}>
-                <ArrowDropDown style={{ margin: "auto" }} />
-              </span>
+              <ArrowDropDown style={{ marginLeft: 4 }} />
             </span>
           </Typography>
         </Stack>
@@ -105,6 +112,10 @@ const MobileNav = () => {
           setOpen={() => setOpen(false)}
         />
       </MenuPopover>
+      <LoginPopover open={openLogin} onClose={() => setOpenLogin(false)} />
+      {showLocationPopup && (
+        <LocationPopup onClose={handleLocationPopupClose} />
+      )}
     </Box>
   );
 };

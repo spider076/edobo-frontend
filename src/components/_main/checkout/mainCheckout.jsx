@@ -135,7 +135,7 @@ const CheckoutMain = () => {
         // Ensure Razorpay script is loaded
         await loadRazorpayScript();
 
-        // Check if Razorpay is properly loaded
+        // Check if Razorpay is properly loaded       
         if (!window.Razorpay) {
           throw new Error('Razorpay SDK failed to load');
         }

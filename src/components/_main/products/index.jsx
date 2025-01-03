@@ -33,36 +33,58 @@ const sortData = [
   { title: 'Newest', key: 'date', value: -1 }
 ];
 const getSearchParams = (searchParams) => {
-  return searchParams.toString().length ? '?' + searchParams.toString() : '';
+  const params = new URLSearchParams(searchParams.toString());
+  return params.toString() ? '?' + params.toString() : '';
 };
+
 export default function ProductListing({ category, subCategory, shop, compaign }) {
   const searchParams = useSearchParams();
   const { rate } = useSelector(({ settings }) => settings);
+  const [userLocation, setUserLocation] = React.useState(null);
+
+  React.useEffect(() => {
+    const storedLocation = window?.localStorage.getItem('location');
+    if (storedLocation) {
+      const locationData = JSON.parse(storedLocation);
+      if (locationData.city) {
+        locationData.city = locationData.city.trim();
+      }
+      setUserLocation(locationData);
+    }
+  }, []);
+
+  console.log('location from localStorage: ', userLocation);
+
   const { data, isLoading } = useQuery(
     [
-      'products' + category || subCategory ? '-with-category' : '',
+      'products' + (category || subCategory ? '-with-category' : ''),
       searchParams.toString(),
       category,
       subCategory,
-      shop
+      shop,
+      compaign,
+      rate,
+      userLocation?.city
     ],
-    () =>
-      api[
-        category
-          ? 'getProductsByCategory'
-          : subCategory
-            ? 'getProductsBySubCategory'
-            : shop
-              ? 'getProductsByShop'
-              : compaign
-                ? 'getProductsByCompaign'
-                : 'getProducts'
-      ](
-        getSearchParams(searchParams),
-        shop ? shop?.slug : category ? category?.slug : subCategory ? subCategory?.slug : compaign ? compaign.slug : '',
-        rate
-      )
+    () => {
+      const queryParams = getSearchParams(searchParams);
+      
+      if (category) {
+        return api.getProductsByCategory(queryParams, category.slug, rate, userLocation?.city);
+      }
+      if (subCategory) {
+        return api.getProductsBySubCategory(queryParams, subCategory.slug, rate, userLocation?.city);
+      }
+      if (shop) {
+        return api.getProductsByShop(queryParams, shop.slug, rate, userLocation?.city);
+      }
+      if (compaign) {
+        return api.getProductsByCompaign(queryParams, compaign.slug, rate, userLocation?.city);
+      }
+      return api.getProducts(queryParams, rate, userLocation?.city);
+    }
   );
+  console.log("pdotucst data : ", data);
   const isMobile = useMediaQuery('(max-width:900px)');
   return (
     <>
