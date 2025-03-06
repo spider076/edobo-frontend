@@ -37,7 +37,6 @@ const LocationPopup = ({ onClose }) => {
     ? JSON.parse(window.localStorage.getItem("location"))
     : null;
 
-  console.log("sadfdsf : ", process.env.GOOGLEMAPS_APIKEY);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: process.env.GOOGLEMAPS_APIKEY,
     libraries: ["places"]
@@ -89,7 +88,7 @@ const LocationPopup = ({ onClose }) => {
         };
         setLocationAccess(coords);
         setSearchInput(place.formatted_address || "");
-        
+
         // Extract address components
         const addressComponents = place.address_components;
         const newAddress = {
@@ -137,11 +136,11 @@ const LocationPopup = ({ onClose }) => {
       coordinates: locationAccess,
       ...address
     };
-    
+
     // Dispatch to Redux and save to localStorage
     dispatch(setLocation(locationData));
     window.localStorage.setItem("location", JSON.stringify(locationData));
-    
+
     console.log("Address Submitted:", locationData);
     onClose();
   };
@@ -150,9 +149,11 @@ const LocationPopup = ({ onClose }) => {
     if (!isVisible) onClose();
   }, [isVisible, onClose, locationAccess]);
 
-  console.log("ocation : ", location);
+  useEffect(() => {
+    handleAllowLocation();
+  }, []);
 
-  if (location) return null;
+  // if (location) return null;
 
   if (!isVisible || !isLoaded) return null;
 
@@ -165,6 +166,8 @@ const LocationPopup = ({ onClose }) => {
         transform: "translateX(-50%)",
         width: "90%",
         maxWidth: "600px",
+        maxHeight: "600px",
+        overflowY: "scroll",
         p: 2,
         bgcolor: "white",
         color: "black",

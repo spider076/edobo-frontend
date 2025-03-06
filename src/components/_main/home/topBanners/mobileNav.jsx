@@ -1,7 +1,7 @@
 "use client";
 
 import { ArrowDropDown } from "@mui/icons-material";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, Typography } from "@mui/material";
 import { useRouter } from "next/navigation";
 import React from "react";
 import { BiUser, BiUserCircle } from "react-icons/bi";
@@ -18,6 +18,9 @@ const MobileNav = () => {
   const [openLogin, setOpenLogin] = React.useState(false);
 
   const isMobile = useMediaQuery("(max-width:768px)");
+  const location = useSelector((state) => state.user.location);
+
+  console.log('location from the mobilenav  ?', location);
 
   const [showLocationPopup, setShowLocationPopup] = React.useState(true);
 
@@ -77,23 +80,37 @@ const MobileNav = () => {
             color="error"
             style={{
               display: "flex",
-              alignItems: "end"
+              alignItems: "start",
+              marginTop: '1px'
             }}
           >
             Deliver to{" "}
-            <span
+            <Button
               onClick={handleOpenUser}
-              style={{
-                marginLeft: 4,
-                fontWeight: 600,
+              disableRipple
+              sx={{
+                marginLeft: 1,
+                fontWeight: 400,
+                fontSize: 15,
                 cursor: "pointer",
                 display: "flex",
-                alignItems: "center",
+                // borderBottom: "4px dashed blue",
+                alignItems: "start",
+                textTransform: 'none',
+                marginBottom: 'auto',
+                padding: 0,
+                minWidth: 'auto',
+                backgroundColor: 'transparent',
+                color: 'gray',
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                  color: 'white'
+                }
               }}
             >
-              Select the pincode
-              <ArrowDropDown style={{ marginLeft: 4 }} />
-            </span>
+              {location ? location.city : "Select the Address."}
+              <ArrowDropDown style={{ marginLeft: 4, marginTop: "4px" }} />
+            </Button>
           </Typography>
         </Stack>
       </Stack>
@@ -113,9 +130,10 @@ const MobileNav = () => {
         />
       </MenuPopover>
       <LoginPopover open={openLogin} onClose={() => setOpenLogin(false)} />
-      {showLocationPopup && (
-        <LocationPopup onClose={handleLocationPopupClose} />
-      )}
+      {showLocationPopup &&
+        (
+          <LocationPopup onClose={handleLocationPopupClose} />
+        )}
     </Box>
   );
 };

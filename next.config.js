@@ -19,7 +19,20 @@ const nextConfig = {
     PAYPAL_CLIENT_ID: process.env.PAYPAL_CLIENT_ID
   },
   images: {
-    domains: ["nextall.vercel.app", "res.cloudinary.com", "www.shutterstock.com"]
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "nextall.vercel.app",
+      },
+      {
+        protocol: "https",
+        hostname: "res.cloudinary.com",
+      },
+      {
+        protocol: "https",
+        hostname: "www.shutterstock.com",
+      },
+    ],
   }
 };
 
